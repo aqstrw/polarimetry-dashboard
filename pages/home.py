@@ -607,9 +607,11 @@ def serve_layout():
                                             ],style = {'width':'95%','height':'90%'}, class_name = 'd-flex p-1 m-1'),
                                         ], class_name = 'd-flex h-100 justify-content-center align-items-center align-content-around m-0 p-0'),
                                     ], class_name = "d-flex w-100 border border-danger align-items-center justify-content-evenly"),
+                                    
+                                    ######################################################
                                     dbc.Row([
-                                        dbc.Col([dbc.Button('Refresh', id='refresh_button',n_clicks=0)],style = {'width':'300px'},class_name = 'd-flex justify-content-start'),
-                                    ], style = {'height':'auto'}, class_name= "d-flex w-100 justify-content-start p-1 m-1"),
+                                        dbc.Col([dbc.Button('Refresh Graphs', id='refresh_button',n_clicks=0)],style = {'width':'auto'},class_name = 'd-flex justify-content-start'),
+                                    ], style = {'height':'auto', 'width':'auto'}, class_name= "d-flex w-100 justify-content-start p-0 m-0"),
 
                                     #######################################################
                                     # Filters
@@ -622,8 +624,6 @@ def serve_layout():
                                     ],class_name= "d-flex w-100 justify-content-center align-items-center border border-secondary"),
 
                                     ##########################################
-
-                                    # Filters
                                     dbc.Row([
                                         dbc.Col(
                                             ["Object ID : "],
