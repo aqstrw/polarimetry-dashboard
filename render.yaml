@@ -1,13 +1,29 @@
+# services:
+#   # See https://render.com/docs/blueprint-spec for more info on render blueprints
+#   - type: web
+#     name: polarimetry-dashboard
+#     env: python
+#     plan: free
+#     # A requirements.txt file must exist
+#     buildCommand: pip install -r requirements.txt
+#     # A src/app.py file must exist and contain `server=app.server`
+#     startCommand: gunicorn --chdir src app:server
+#     envVars:
+#       - key: PYTHON_VERSION
+#         value: 3.10.11
+
+# Exported from Render on 2024-07-26T20:13:23Z
 services:
-  # See https://render.com/docs/blueprint-spec for more info on render blueprints
-  - type: web
-    name: polarimetry-dashboard
-    env: python
-    plan: free
-    # A requirements.txt file must exist
-    buildCommand: pip install -r requirements.txt
-    # A src/app.py file must exist and contain `server=app.server`
-    startCommand: gunicorn --chdir src app:server
-    envVars:
-      - key: PYTHON_VERSION
-        value: 3.10.11
+- type: web
+  name: polarimetry-dashboard
+  runtime: python
+  repo: https://github.com/aqstrw/polarimetry-dashboard
+  plan: free
+  envVars:
+  - key: PYTHON_VERSION
+    sync: false
+  region: oregon
+  buildCommand: pip install -r requirements.txt
+  startCommand: gunicorn --chdir src app:server
+version: "1"
+
