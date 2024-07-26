@@ -21,9 +21,10 @@ services:
   plan: free
   envVars:
   - key: PYTHON_VERSION
+    value: 3.10.11
     sync: false
   region: oregon
-  buildCommand: pip install -r requirements.txt
+  buildCommand: pip install --upgrade pip && pip install -r requirements.txt
   startCommand: gunicorn --chdir src app:server
 version: "1"
 
