@@ -153,6 +153,8 @@ def get_qudf(c,p,ri,df_reset):
 
 app = dash.Dash(__name__, use_pages = True,) # external_stylesheets=[dbc.themes.QUARTZ]
 
+server = app.server
+
 app.layout = html.Div(
     [   
         # main app store
