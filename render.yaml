@@ -24,7 +24,7 @@ services:
     value: 3.10.11
     sync: false
   region: oregon
-  buildCommand: pip install --upgrade pip && pip install -r requirements.txt
+  buildCommand: python3 -m pip install --upgrade packaging && pip install -r requirements.txt
   startCommand: gunicorn --chdir src app:server
 version: "1"
 
