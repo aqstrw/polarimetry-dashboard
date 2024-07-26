@@ -1,7 +1,6 @@
 import numpy as np
 import pandas as pd
 import pickle
-import plotly
 import plotly.express as px
 import dash_bootstrap_components as dbc
 import dash
@@ -195,70 +194,52 @@ dict_basedf = {t:get_basedf(t_pull = t) for t in tlist}
 
 ###################################### Figure Functions ######################################################
 def make_stats_scatter(c,p,ri,df_reset):
-    fig = make_subplots(rows=2, cols=2, shared_yaxes='rows',shared_xaxes = 'columns',vertical_spacing=0.02, horizontal_spacing=0.02, column_widths=[0.9,0.1], row_heights=[0.1,0.9]) #subplot_titles=("distribution in q-space","distribution in u-space")
-    # xbins = np.histogram_bin_edges(df_reset['q_scm'])
-    # fig_xhist = px.histogram(df_reset.reset_index(),x='q_scm',bins = xbins)
-    counts, bins = np.histogram(df_reset['q_scm'][df_reset['q_scm'].between(-0.3,0.3)], bins='sqrt')
-    # print(bins)
-    bins = 0.5 * (bins[:-1] + bins[1:])
-    fig_xhist = px.bar(x=bins, y=counts, text_auto = True, opacity = 0.5,color_discrete_sequence=['white'])
-
-    fig_xhist.update_layout(
-        plot_bgcolor='rgba(0, 0, 0, 0)',
-        paper_bgcolor='rgba(0,0,0,0)',
-        # font_family="Courier New",
-        font_color="white",
-        # title_font_family="Times New Roman",
-        title_font_color="white",
-        legend_title_font_color="white",
-        legend=dict(
-            title = 'Bin #',
-            orientation='v',
-            yanchor="top",
-            y=1,
-            xanchor="left",
-            x=0.85,
-            bgcolor = 'rgba(184, 171, 178, 0.28)',
-            bordercolor = 'white'),
-    )
-
-    # fig_yhist = px.histogram(df_reset.reset_index(),y='u_scm',)
-    counts, bins = np.histogram(df_reset['u_scm'][df_reset['u_scm'].between(-0.3,0.3)], bins='sqrt')
-    # print(bins)
-    bins = 0.5 * (bins[:-1] + bins[1:])
-    fig_yhist = px.bar(y=bins, x=counts, orientation='h')
-    fig_yhist.update_layout(
-        plot_bgcolor='rgba(0, 0, 0, 0)',
-        paper_bgcolor='rgba(0,0,0,0)',
-        # font_family="Courier New",
-        font_color="white",
-        # title_font_family="Times New Roman",
-        title_font_color="white",
-        legend_title_font_color="white",
-        legend=dict(
-            title = 'Bin #',
-            orientation='v',
-            yanchor="top",
-            y=1,
-            xanchor="left",
-            x=0.85,
-            bgcolor = 'rgba(184, 171, 178, 0.28)',
-            bordercolor = 'white'),
-    )
+    fig = make_subplots(rows=2, cols=2, shared_yaxes='rows',subplot_titles=("rotated_q vs. ellipticity","rotated_u vs. ellipticity"), horizontal_spacing=0.07)
+    fig_xhist = px.histogram(df_reset.reset_index(),x='q_scm',)
     fig.add_trace(fig_xhist["data"][0], col = 1, row = 1,)
-    fig.add_trace(fig_yhist["data"][0], col = 2, row = 2,)
-
     figspread = px.scatter(
         df_reset.reset_index(),
         x='q_scm',
         y ='u_scm',
         color='ell_bins',
         custom_data=['CHIP','POS','row_index'],
-        color_discrete_sequence = plotly.colors.cyclical.Edge,
+        # size = 10,
+        # opacity = get_rls(df_poldata_2p25_exp_clean_forplotly),
+        # height=620,
+        # showgrid = False,
+        # width = 620,
         )
     # figspread.update_layout(xaxis=dict(scaleanchor='y', scaleratio=1))
     figspread.update_traces(marker=dict(size=3))
-    
+    figspread.layout.xaxis.range = [df_reset.loc[(c,p,ri),'q_scm']-0.3,df_reset.loc[(c,p,ri),'q_scm']+0.3]
+    figspread.layout.yaxis.range = [df_reset.loc[(c,p,ri),'u_scm']-0.3,df_reset.loc[(c,p,ri),'u_scm']+0.3]
+    figspread.layout.xaxis.zerolinecolor = 'lightslategray'
+    figspread.layout.yaxis.zerolinecolor = 'lightslategray'
+    figspread.add_hline(
+            # x0=0,
+            y=df_reset.loc[(c,p,ri),'u_scm'],#.iloc[0],
+            # x1=7,
+            # y1 = stats[0],
+            # line=dict(color='rgba(100,0,100,0.9)',dash = 'dash',line_width = 1),
+            line_color='rgba(153, 74, 246, 0.8)',
+            line_dash = 'dash',
+            line_width = 2,
+            # xref='x',
+            # yref='y',
+        )
+    figspread.add_vline(
+            # x0=0,
+            x=df_reset.loc[(c,p,ri),'q_scm'],#.iloc[0],
+            # x1=7,
+            # y1 = stats[0],
+            # line=dict(color='Black',dash = 'dash',line_width = 1),
+            line_color='#e83283',
+            line_dash = 'dash',
+            line_width = 2,
+            name = 'vline',
+            # xref='x',
+            # yref='y',
+        )
 
     figspread.update_layout(
         plot_bgcolor='rgba(0, 0, 0, 0)',
@@ -278,84 +259,12 @@ def make_stats_scatter(c,p,ri,df_reset):
             bgcolor = 'rgba(184, 171, 178, 0.28)',
             bordercolor = 'white'),
         )
-    
-    figspread.update_layout(margin=dict(l=20, r=20, t=20, b=20),)
+    fig.update_layout(margin=dict(l=20, r=20, t=20, b=20),)
     figspread.update_xaxes(showgrid = False,showline=False, ) #linewidth=10, linecolor='purple',
     figspread.update_yaxes(showgrid = False, showline=False, ) #linewidth=10, linecolor='red'
     
     for trace in range(len(figspread["data"])):
         fig.add_trace(figspread["data"][trace], col = 1, row = 2,)
-    fig.update_layout(
-        plot_bgcolor='rgba(0, 0, 0, 0)',
-        paper_bgcolor='rgba(0,0,0,0)',
-        # font_family="Courier New",
-        font_color="white",
-        # title_font_family="Times New Roman",
-        title_font_color="white",
-        legend_title_font_color="white",
-        legend=dict(
-            title = 'Bin #',
-            orientation='v',
-            yanchor="top",
-            y=1,
-            xanchor="right",
-            x=1,
-            bgcolor = 'rgba(184, 171, 178, 0.28)',
-            bordercolor = 'white'),
-        margin=dict(l=20, r=20, t=20, b=20),
-    )
-    
-    fig.add_hline(
-            # x0=0,
-            y=df_reset.loc[(c,p,ri),'u_scm'],#.iloc[0],
-            # x1=7,
-            # y1 = stats[0],
-            # line=dict(color='rgba(100,0,100,0.9)',dash = 'dash',line_width = 1),
-            line_color='rgba(57, 203, 251, 0.8)',
-            line_dash = 'dash',
-            line_width = 3,
-            # xref='x',
-            # yref='y',
-            row = 2,
-            col = 1,
-        )
-    fig.add_vline(
-            # x0=0,
-            x=df_reset.loc[(c,p,ri),'q_scm'],#.iloc[0],
-            # x1=7,
-            # y1 = stats[0],
-            # line=dict(color='Black',dash = 'dash',line_width = 1),
-            line_color=' rgba(213, 86, 135, 0.8)',
-            line_dash = 'dash',
-            line_width = 3,
-            name = 'vline',
-            # xref='x',
-            # yref='y',
-            row = 2,
-            col = 1,
-        )
-    
-    
-    fig.update_xaxes(zerolinecolor='lightslategray',zerolinewidth=1, row=1, col = 1)
-    fig.update_yaxes(zerolinecolor='lightslategray',zerolinewidth=1, row=1, col = 1)
-
-    fig.update_xaxes(title = 'q_scm', range=[df_reset.loc[(c,p,ri),'q_scm']-0.3,df_reset.loc[(c,p,ri),'q_scm']+0.3],zerolinecolor='lightslategray',zerolinewidth=1, row=2, col = 1)
-    fig.update_yaxes(title = 'u_scm',range=[df_reset.loc[(c,p,ri),'u_scm']-0.3,df_reset.loc[(c,p,ri),'u_scm']+0.3],zerolinecolor='lightslategray',zerolinewidth=1, row=2, col = 1)
-
-    fig.update_xaxes(zerolinecolor='lightslategray',zerolinewidth=1,showticklabels = False, row=2, col = 2)
-    fig.update_yaxes(zerolinecolor='lightslategray',zerolinewidth=1, row=2, col = 2)
-    # fig.update_layout.yaxis.range = [df_reset.loc[(c,p,ri),'u_scm']-0.3,df_reset.loc[(c,p,ri),'u_scm']+0.3]
-    # fig.update_layout.xaxis.zerolinecolor = 'lightslategray'
-    # fig.update_layout.yaxis.zerolinecolor = 'lightslategray'
-
-    fig.update_xaxes(showgrid = False,showline=False, row=1,col=1) #linewidth=10, linecolor='purple',
-    fig.update_yaxes(showgrid = False, showline=False, row=1,col=1) #linewidth=10, linecolor='red'
-
-    fig.update_xaxes(showgrid = False,showline=False, row=2,col=1) #linewidth=10, linecolor='purple',
-    fig.update_yaxes(showgrid = False, showline=False, row=2,col=1)
-
-    fig.update_xaxes(showgrid = False,showline=False, row=2,col=2) #linewidth=10, linecolor='purple',
-    fig.update_yaxes(showgrid = False, showline=False, row=2,col=2)
     return fig
 def make_individ_stats_fig(qu,c,p,ri,sig,qudf_dict,df_reset):
     qudf = qudf_dict[qu]
@@ -942,17 +851,17 @@ def update_figs(spread_clickdata,refresh_clicks,submit_clicks,\
                 global_df_rotated, global_rotated_rows, global_rotated_cols, global_df_filtered, global_filtered_rows, global_filtered_cols, global_qudict, global_df_binned, global_df_statedict, global_object_statedict):
 
     
-    # print("triggered by element with id : {}".format(dash.callback_context.triggered_id))
-    # print("triggered: {}".format(format(dash.callback_context.triggered)))
+    print("triggered by element with id : {}".format(dash.callback_context.triggered_id))
+    print("triggered: {}".format(format(dash.callback_context.triggered)))
 
     # firstrun: get df, expand, and plot
     if dash.callback_context.triggered_id is None:
-        # print("all initial setup is done in the local page file serverside")
+        print("all initial setup is done in the local page file serverside")
         raise PreventUpdate
     
     # if global stores are empty
     if (refresh_clicks == 0) and any([kw is None for kw in [global_df_rotated, global_rotated_rows, global_rotated_cols, global_df_filtered, global_filtered_rows, global_filtered_cols,global_qudict, global_df_binned, global_df_statedict, global_object_statedict]]):
-        # print("populating datasets")
+        print("populating datasets")
         # print("Nones : {}".format([kw is None for kw in [global_df_rotated, global_rotated_rows, global_rotated_cols, global_df_filtered, global_filtered_rows, global_filtered_cols,\
                                                         #  global_qudict, global_df_binned, global_df_statedict, global_object_statedict]]))
         # run calcs
@@ -993,7 +902,7 @@ def update_figs(spread_clickdata,refresh_clicks,submit_clicks,\
 
     # if refresh clicked
     if (dash.callback_context.triggered_id == 'refresh_button') and (refresh_clicks > 0):
-        # print('refresh clicked',refresh_clicks)
+        print('refresh clicked',refresh_clicks)
 
         # run calcs
         df_stats = calc_scstats_and_avgphil(t_input,sig_input)
@@ -1031,7 +940,7 @@ def update_figs(spread_clickdata,refresh_clicks,submit_clicks,\
 
     # if submit clicked
     elif (dash.callback_context.triggered_id == 'submit_button') and (submit_clicks > 0):
-        # print('submit clicked',submit_clicks)
+        print('submit clicked',submit_clicks)
         df_filtered, df_binned_stats = read_from_store_wrapper(global_df_filtered, rows = jsontomind(global_filtered_rows, rows = True), cols = jsontomind(global_filtered_cols), levels = 1),\
             read_from_store_wrapper(global_df_binned, levels = 1)
         # print(df_filtered)
@@ -1077,7 +986,7 @@ def update_figs(spread_clickdata,refresh_clicks,submit_clicks,\
 
     # if spread clicked
     elif (dash.callback_context.triggered_id == 'spread') and (spread_clickdata is not None):
-        # print('clickdata triggered', spread_clickdata)
+        print('clickdata triggered', spread_clickdata)
         filtered_row_names = jsontomind(global_filtered_rows, rows = True)
         filtered_col_names = jsontomind(global_filtered_cols)
         # print("after: \n",pd.MultiIndex.from_arrays(np.array(global_filtered_rows)),pd.MultiIndex.from_arrays(np.array(global_filtered_cols)))
@@ -1110,7 +1019,7 @@ def update_figs(spread_clickdata,refresh_clicks,submit_clicks,\
         dict_dfbinned = df_binned_stats.to_dict()
 
     else:
-        # print("probably a recursive primary trigger because of external store inputs / unknown reason")
+        print("probably a recursive primary trigger because of external store inputs / unknown reason")
         raise PreventUpdate
 
     # chip_output, pos_output, row_index_output, spread_clickdata_output = chip_plot, pos_plot, rowindex_plot, spread_clickdata_plot
