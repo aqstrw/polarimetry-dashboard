@@ -5,12 +5,13 @@ import plotly
 import plotly.express as px
 import dash_bootstrap_components as dbc
 import dash
-from dash import html, dcc, Input, Output, callback, State
+from dash import html, dcc, Input, Output, callback, State, clientside_callback
 from astropy.stats import sigma_clipped_stats as scs
 from dash.exceptions import PreventUpdate
 import warnings
 import time
 from plotly.subplots import make_subplots
+import json
 warnings.filterwarnings("ignore", message = ".*FITS standard.*")
 warnings.filterwarnings("ignore", message = ".*RADECSYS.*")
 warnings.filterwarnings("ignore", message = ".*invalid value encountered in sqrt.*")
@@ -577,7 +578,9 @@ init_fig_spread = make_stats_scatter(init_chip, init_pos, init_rowindex, init_df
 init_figq_rotated, init_figu_rotated = make_trendplot(init_df_filtered['across_offsets'],init_df_binned_stats)
 init_fig_q = make_individ_stats_fig('q', init_chip, init_pos, init_rowindex, init_sigexp, init_qudict, init_df_filtered['across_offsets'])
 init_fig_u = make_individ_stats_fig('u', init_chip, init_pos, init_rowindex, init_sigexp, init_qudict, init_df_filtered['across_offsets'])
-    
+# dummy = dict(name='ambar', lastname = 'qadeer')
+# print(json.dumps(dummy))
+
 #################################################
 ###################################################
 dash.register_page(__name__, path='/', name = 'Home')
@@ -695,7 +698,7 @@ def serve_layout():
                                                 ], class_name = 'd-flex justify-content-center'),
                                             ],style = {'width':'100%',}, class_name = 'd-flex p-1 m-1'),
                                         ], class_name = 'd-flex h-100 justify-content-center align-items-center align-content-around m-0 p-0'),
-                                    ], class_name = "d-flex w-100 p-0 m-0 align-items-center justify-content-between"),
+                                    ], class_name = "d-flex flex-column flex-lg-row w-100 p-0 m-0 align-items-center justify-content-between"),
                                     
                                     ######################################################
                                     dbc.Row([
@@ -708,8 +711,6 @@ def serve_layout():
                             
                             dbc.Row([
                                 dbc.Col([
-                                    
-                                    # Filters
                                     dbc.Row([
                                         dbc.Col(
                                             ["Object spread in q-u space"],
@@ -772,50 +773,91 @@ def serve_layout():
                                     dbc.Row([
                                         ########################
                                         dbc.Col([
-                                            dbc.Card([
-                                                dcc.Loading([
-                                                    dcc.Graph(
-                                                        figure = init_fig_spread, id='spread',
-                                                        style = {'height':'65vh', 'width':'45vw'}
-                                                    )],
-                                                    color="blue",
-                                                    type="default",
+                                                dbc.Card([
+                                                        dcc.Loading([
+                                                                dcc.Graph(
+                                                                    figure = init_fig_spread,
+                                                                    id='spread',
+                                                                    style = {'height':'100%', 'width':'100%'},
+                                                                    className='d-flex p-0 m-0 border border-1 border-danger'
+                                                                ),
+                                                            ],
+                                                            parent_style = {'height':'100%', 'width':'100%'},
+                                                            color="blue",
+                                                            type="default",
+                                                            # spinner_class_name= "d-flex border border-1 border-primary p-0 m-0 align-items-center justify-content-center",
+                                                        ),
+                                                    ],
+                                                    style = {'height':'100%','width':'100%'},
+                                                    class_name = "d-flex p-0 m-0 align-items-center justify-content-center"
                                                 ),
-                                            ]),
-                                        ], className = "d-flex-inline p-0 ms-2 align-content-around justify-content-center"),
+                                            ],
+                                            style = {'height':'70vh',},
+                                            class_name = "d-flex border border-1 border-tertiary p-0 m-0 justify-content-center",
+                                        ),
                                         ########################
                                         dbc.Col([
-
-                                            dbc.Row([
-                                                dbc.Col([
+                                                dbc.Row(
+                                                    # dbc.Col(
                                                     dbc.Card([
-                                                        dcc.Loading(
-                                                            children = [dcc.Graph(figure = init_fig_u, id='polarimetry_u',style = {'height':'30vh', 'width':'45vw'}),],
-                                                            # color="black",
-                                                            type="default",
-                                                        ),
-                                                    ], class_name = 'd-flex border border-tertiary m-0 p-0'),
-                                                ],class_name = 'd-flex h-100 align-items-center justify-content-center m-0 p-0')
-                                            ],style = {'height':'35vh'},className = 'd-flex align-items-center justify-content-center m-0 p-0'),
-
-                                            dbc.Row([
-                                                dbc.Col([
+                                                            dcc.Loading(
+                                                                children = [dcc.Graph(
+                                                                    figure = init_fig_u,
+                                                                    id='polarimetry_u',
+                                                                    style = {'height':'100%', 'width':'100%'}
+                                                                    ),
+                                                                ],
+                                                                color='rgba(109, 49, 128, 0.8)',
+                                                                parent_style = {'height':'100%', 'width':'100%',},
+                                                                type="default",
+                                                            ),
+                                                        ],
+                                                        style = {'height':'100%', 'width':'100%'},
+                                                        class_name = 'd-flex border border-tertiary align-items-center m-0 p-0'
+                                                    ),
+                                                    class_name = 'd-flex h-50 w-100 border border-1 p-0 m-0'
+                                                ),
+                                                dbc.Row(
+                                                    # dbc.Col(
                                                     dbc.Card([
-                                                        dcc.Loading(
-                                                            children = [dcc.Graph(figure = init_fig_q, id='polarimetry_q',style = {'height':'30vh', 'width':'45vw'}),],
-                                                            color="black",
-                                                            type="default",
-                                                        ),
-                                                    ], class_name = 'd-flex border border-info m-0 p-0'),
-                                                ],class_name = 'd-flex h-100 align-items-center justify-content-center m-0 p-0')
-                                            ],style = {'height':'35vh'},className = 'd-flex align-items-center justify-content-center m-0 p-0'),
-                                        
-                                        ], class_name = "d-flex-inline h-100 w-50 flex-wrap justify-content-between align-content-center p-0 m-0"),
+                                                            dcc.Loading(
+                                                                children = [dcc.Graph(
+                                                                    figure = init_fig_q,
+                                                                    id='polarimetry_q',
+                                                                    style = {'height':'100%', 'width':'100%'}
+                                                                    ),
+                                                                ],
+                                                                color='rgba(109, 49, 128, 0.8)',
+                                                                parent_style = {'height':'100%', 'width':'100%',},
+                                                                type="default",
+                                                            ),
+                                                        ],
+                                                        style = {'height':'100%', 'width':'100%'},
+                                                        class_name = 'd-flex border border-tertiary align-items-center m-0 p-0'
+                                                    ),
+                                                    class_name = 'd-flex h-50 w-100 border border-1 p-0 m-0'
+                                                ),
+                                            ],
+                                            style = {'height':'70vh',},
+                                            class_name = "d-flex flex-column border border-1 border-info justify-content-between align-content-between p-0 m-0",
+                                        ),
                                         ########################
-                                    ],style = {'height':'70vh',}, class_name = 'd-flex w-100 justify-content-evenly align-content-evenly p-0 m-0'),
+                                    ],style = {'height':'auto',}, class_name = 'd-flex flex-column flex-lg-row w-100 justify-content-evenly align-content-evenly p-0 m-0'),
                                 ], style = {'height':'auto'},class_name = 'd-flex flex-wrap justify-content-center align-items-center p-0 m-0'),
-                            ], style = {'height':'auto',},class_name = 'd-flex w-100 pt-1 m-0 pb-1 mt-2 justify-content-center border border-3 border-primary rounded-2 align-items-center'),
+                            ], style = {'height':'auto',},class_name = 'd-flex w-100 pt-0 m-0 pb-0 mt-2 justify-content-center border border-3 border-primary rounded-2 align-items-between'),
                             ###################################
+
+                            #testrow
+                            dbc.Row([
+                                dbc.Col(
+                                    children = json.dumps("Polarimetry aligned with the object vs Ellipticity"),
+                                    style = {'height':'auto'},
+                                    id = 'testrow',
+                                    class_name = "d-flex fs-5 fw-bold text-uppercase pt-2 pb-2 align-items-center justify-content-start"
+                                ),
+                            ],class_name= "d-flex w-100 justify-content-center align-items-center "),
+
+
 
                             # rotated plots
                             dbc.Row([
@@ -888,6 +930,8 @@ layout = serve_layout
     Output('global_df_binned','data'),
     Output('global_df_statedict','data'),
     Output('global_object_statedict','data'),
+    Output('global_fig_polq','data'),
+    Output('global_fig_spread','data'),
 
     # update dropdowns/inputs
     Output('chip_input','value'),
@@ -895,12 +939,12 @@ layout = serve_layout
     Output('row_index_input','value'),
     Output('iloc_input','placeholder'),
     Output('iloc_input','value'),
-    Output('spread','clickData'),
+    # Output('spread','clickData'),
 
     #######################################
     
     # get click data
-    Input('spread','clickData'),
+    # Input('spread','clickData'),
     Input('refresh_button', 'n_clicks'),
     Input('submit_button', 'n_clicks'),
 
@@ -935,14 +979,13 @@ layout = serve_layout
     # callback setup
     # prevent_initial_call = 'True',
     # suppress_callback_exceptions=True,#data_clickcount, 
-)   
-def update_figs(spread_clickdata,refresh_clicks,submit_clicks,\
+)   #spread_clickdata,
+def update_figs(refresh_clicks,submit_clicks,\
                 t_input, sig_input, npix_input, errorthresh_input, bins_input, tk_input,\
                 chip_input, pos_input, row_index_input, iloc_input,\
                 global_df_rotated, global_rotated_rows, global_rotated_cols, global_df_filtered, global_filtered_rows, global_filtered_cols, global_qudict, global_df_binned, global_df_statedict, global_object_statedict):
 
-    
-    # print("triggered by element with id : {}".format(dash.callback_context.triggered_id))
+    print("triggered by element with id : {}".format(dash.callback_context.triggered_id))
     # print("triggered: {}".format(format(dash.callback_context.triggered)))
 
     # firstrun: get df, expand, and plot
@@ -952,7 +995,7 @@ def update_figs(spread_clickdata,refresh_clicks,submit_clicks,\
     
     # if global stores are empty
     if (refresh_clicks == 0) and any([kw is None for kw in [global_df_rotated, global_rotated_rows, global_rotated_cols, global_df_filtered, global_filtered_rows, global_filtered_cols,global_qudict, global_df_binned, global_df_statedict, global_object_statedict]]):
-        # print("populating datasets")
+        print("populating datasets")
         # print("Nones : {}".format([kw is None for kw in [global_df_rotated, global_rotated_rows, global_rotated_cols, global_df_filtered, global_filtered_rows, global_filtered_cols,\
                                                         #  global_qudict, global_df_binned, global_df_statedict, global_object_statedict]]))
         # run calcs
@@ -978,6 +1021,7 @@ def update_figs(spread_clickdata,refresh_clicks,submit_clicks,\
             'pos':pos_plot,
             'row_index':rowindex_plot,
         }
+
         global_df_statedict = df_statedict = {
             't':t_input,
             'sigexp':sig_input,
@@ -1075,39 +1119,39 @@ def update_figs(spread_clickdata,refresh_clicks,submit_clicks,\
         dict_qudict = {qu:df.to_dict() for qu,df in qudict.items()}
         dict_dfbinned = df_binned_stats.to_dict()
 
-    # if spread clicked
-    elif (dash.callback_context.triggered_id == 'spread') and (spread_clickdata is not None):
-        # print('clickdata triggered', spread_clickdata)
-        filtered_row_names = jsontomind(global_filtered_rows, rows = True)
-        filtered_col_names = jsontomind(global_filtered_cols)
-        # print("after: \n",pd.MultiIndex.from_arrays(np.array(global_filtered_rows)),pd.MultiIndex.from_arrays(np.array(global_filtered_cols)))
-        df_filtered, df_binned_stats = read_from_store_wrapper(global_df_filtered, rows = filtered_row_names, cols = filtered_col_names, levels = 1),\
-            read_from_store_wrapper(global_df_binned, levels = 1)
-        # print(df_filtered)
-        chip_plot,pos_plot,rowindex_plot = spread_clickdata['points'][0]['customdata']
-        iloc_placeholder = "current iloc : {}".format(df_filtered.index.get_loc((chip_plot,pos_plot,int(rowindex_plot))))
-        qudict = get_qudf(chip_plot, pos_plot, rowindex_plot, df_filtered)
+    # # if spread clicked
+    # elif (dash.callback_context.triggered_id == 'spread') and (spread_clickdata is not None):
+    #     # print('clickdata triggered', spread_clickdata)
+    #     filtered_row_names = jsontomind(global_filtered_rows, rows = True)
+    #     filtered_col_names = jsontomind(global_filtered_cols)
+    #     # print("after: \n",pd.MultiIndex.from_arrays(np.array(global_filtered_rows)),pd.MultiIndex.from_arrays(np.array(global_filtered_cols)))
+    #     df_filtered, df_binned_stats = read_from_store_wrapper(global_df_filtered, rows = filtered_row_names, cols = filtered_col_names, levels = 1),\
+    #         read_from_store_wrapper(global_df_binned, levels = 1)
+    #     # print(df_filtered)
+    #     chip_plot,pos_plot,rowindex_plot = spread_clickdata['points'][0]['customdata']
+    #     iloc_placeholder = "current iloc : {}".format(df_filtered.index.get_loc((chip_plot,pos_plot,int(rowindex_plot))))
+    #     qudict = get_qudf(chip_plot, pos_plot, rowindex_plot, df_filtered)
 
-        # prep data for store
-        rotated_col_names = jsontomind(global_rotated_cols)
-        rotated_row_names = jsontomind(global_rotated_rows, rows = True)
-        object_statedict = {
-            'chip':chip_plot,
-            'pos':pos_plot,
-            'row_index':rowindex_plot,
-        }
-        df_statedict = {
-            't':t_input,
-            'sigexp':sig_input,
-            'npix':npix_input,
-            'errorthresh':errorthresh_input,
-            'bins':bins_input,
-            'tk':tk_input,
-        }
-        dict_df_rotated_reset = global_df_rotated
-        dict_df_filtered_reset = global_df_filtered
-        dict_qudict = {qu:df.to_dict() for qu,df in qudict.items()}
-        dict_dfbinned = df_binned_stats.to_dict()
+    #     # prep data for store
+    #     rotated_col_names = jsontomind(global_rotated_cols)
+    #     rotated_row_names = jsontomind(global_rotated_rows, rows = True)
+    #     object_statedict = {
+    #         'chip':chip_plot,
+    #         'pos':pos_plot,
+    #         'row_index':rowindex_plot,
+    #     }
+    #     df_statedict = {
+    #         't':t_input,
+    #         'sigexp':sig_input,
+    #         'npix':npix_input,
+    #         'errorthresh':errorthresh_input,
+    #         'bins':bins_input,
+    #         'tk':tk_input,
+    #     }
+    #     dict_df_rotated_reset = global_df_rotated
+    #     dict_df_filtered_reset = global_df_filtered
+    #     dict_qudict = {qu:df.to_dict() for qu,df in qudict.items()}
+    #     dict_dfbinned = df_binned_stats.to_dict()
 
     else:
         # print("probably a recursive primary trigger because of external store inputs / unknown reason")
@@ -1120,10 +1164,38 @@ def update_figs(spread_clickdata,refresh_clicks,submit_clicks,\
     fig_rotatedq, fig_rotatedu = make_trendplot(df_filtered['across_offsets'],df_binned_stats)
     fig_q = make_individ_stats_fig('q', chip_plot, pos_plot, rowindex_plot, sig_input, qudict, df_filtered['across_offsets'])
     fig_u = make_individ_stats_fig('u', chip_plot, pos_plot, rowindex_plot, sig_input, qudict, df_filtered['across_offsets'])
+    print('reached')
 
     return (fig_q, fig_u, fig_spread, fig_rotatedq, fig_rotatedu,\
-        dict_df_rotated_reset, mindtojson(rotated_row_names), mindtojson(rotated_col_names), dict_df_filtered_reset, mindtojson(filtered_row_names), mindtojson(filtered_col_names), dict_qudict, dict_dfbinned, df_statedict, object_statedict,\
-        chip_plot, pos_plot, rowindex_plot, iloc_placeholder, None, spread_clickdata)
+        dict_df_rotated_reset, mindtojson(rotated_row_names), mindtojson(rotated_col_names), dict_df_filtered_reset, mindtojson(filtered_row_names), mindtojson(filtered_col_names), dict_qudict, dict_dfbinned, df_statedict, object_statedict, fig_q, fig_spread,\
+        chip_plot, pos_plot, rowindex_plot, iloc_placeholder, None)
+
+clientside_callback(
+    """
+    function(tr, cd, figq) {
+        try {
+                let y = figq.data;
+                console.log(y);
+                const pi = 3.14;
+                return pi;
+            }
+        catch(err) {
+                console.log(err.message)
+                return err.message;
+            }
+    }
+    """,
+    Output('testrow', 'children'),
+    Input('testrow','children'),
+    Input('spread','clickData'),
+    State('global_fig_polq','data'),
+    # callback setup
+    prevent_initial_call = 'True',
+    # State('global_qudict','data'),
+    # State('global_df_binned','data'),
+    # State('global_df_statedict','data'),
+    # State('global_object_statedict','data'),
+)
 
 
 # if __name__ == "__main__":

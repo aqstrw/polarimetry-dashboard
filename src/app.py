@@ -171,6 +171,9 @@ app.layout = html.Div(
         dcc.Store(id = 'global_df_binned',),
         dcc.Store(id = 'global_df_statedict',),
         dcc.Store(id = 'global_object_statedict',),
+        
+        dcc.Store(id = 'global_fig_polq',),
+        dcc.Store(id = 'global_fig_spread',),
 
         # main app framework
         dbc.NavbarSimple(
