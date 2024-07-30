@@ -5,12 +5,13 @@ import plotly
 import plotly.express as px
 import dash_bootstrap_components as dbc
 import dash
-from dash import html, dcc, Input, Output, callback, State
+from dash import html, dcc, Input, Output, callback, State, clientside_callback
 from astropy.stats import sigma_clipped_stats as scs
 from dash.exceptions import PreventUpdate
 import warnings
 import time
 from plotly.subplots import make_subplots
+import json
 warnings.filterwarnings("ignore", message = ".*FITS standard.*")
 warnings.filterwarnings("ignore", message = ".*RADECSYS.*")
 warnings.filterwarnings("ignore", message = ".*invalid value encountered in sqrt.*")
@@ -577,7 +578,9 @@ init_fig_spread = make_stats_scatter(init_chip, init_pos, init_rowindex, init_df
 init_figq_rotated, init_figu_rotated = make_trendplot(init_df_filtered['across_offsets'],init_df_binned_stats)
 init_fig_q = make_individ_stats_fig('q', init_chip, init_pos, init_rowindex, init_sigexp, init_qudict, init_df_filtered['across_offsets'])
 init_fig_u = make_individ_stats_fig('u', init_chip, init_pos, init_rowindex, init_sigexp, init_qudict, init_df_filtered['across_offsets'])
-    
+# dummy = dict(name='ambar', lastname = 'qadeer')
+# print(json.dumps(dummy))
+
 #################################################
 ###################################################
 dash.register_page(__name__, path='/', name = 'Home')
@@ -695,7 +698,7 @@ def serve_layout():
                                                 ], class_name = 'd-flex justify-content-center'),
                                             ],style = {'width':'100%',}, class_name = 'd-flex p-1 m-1'),
                                         ], class_name = 'd-flex h-100 justify-content-center align-items-center align-content-around m-0 p-0'),
-                                    ], class_name = "d-flex w-100 p-0 m-0 align-items-center justify-content-between"),
+                                    ], class_name = "d-flex flex-column flex-lg-row w-100 p-0 m-0 align-items-center justify-content-between"),
                                     
                                     ######################################################
                                     dbc.Row([
@@ -708,113 +711,261 @@ def serve_layout():
                             
                             dbc.Row([
                                 dbc.Col([
-                                    
-                                    # Filters
-                                    dbc.Row([
-                                        dbc.Col(
-                                            ["Object spread in q-u space"],
-                                            style = {'height':'8vh'},
-                                            class_name = "d-flex fs-5 fw-bold text-uppercase align-items-center justify-content-start"
-                                        ),
-                                    ],class_name= "d-flex w-100 justify-content-center align-items-center"),
-
-                                    ##########################################
-                                    dbc.Row([
-                                        dbc.Col(
-                                            ["Object ID : "],
-                                            style = {'height':'8vh'},
-                                            width = 'auto',
-                                            class_name = "d-flex fs-5 fw-bold text-uppercase align-items-center justify-content-start"
-                                        ),
-
-                                        dbc.Col([
-                                            dbc.Select(
-                                                id = 'chip_input',
-                                                options=chiplist,
-                                                value = init_chip,                                                      
-                                            ),
-                                        ], class_name='d-flex m-0 ps-1 pe-1 pt-1 pb-1',),
-
-                                        dbc.Col([
-                                            dbc.Select(
-                                                id = 'pos_input',
-                                                options=poslist,
-                                                value = init_pos,                                                        
-                                            ),
-                                        ], class_name='d-flex m-0 ps-1 pe-1 pt-1 pb-1',),
-
-                                        dbc.Col([
-                                            dbc.Input(
-                                                id = 'row_index_input',
-                                                type = 'number',
-                                                value = init_rowindex,                                                        
-                                            ),
-                                        ], class_name='d-flex m-0 ps-1 pe-1 pt-1 pb-1',),
-
-                                        dbc.Col([
-
-                                            dbc.Input(
-                                                id = 'iloc_input',
-                                                type = 'number',
-                                                placeholder = 'current index : 0',                                                        
-                                            ),
-                                        ], class_name='d-flex m-0 ps-1 pe-1 pt-1 pb-1',),
-
-                                        dbc.Col([
-                                            dbc.Button('Submit', id='submit_button',n_clicks=0, class_name='w-100')],
-                                            class_name = 'd-flex justify-content-center m-0 p-1'
-                                        ),
-
-                                    ],class_name= "d-flex w-100 justify-content-center border-top border-bottom border-2 align-items-center "),
-
-                                    #####################################
-
-                                    dbc.Row([
-                                        ########################
-                                        dbc.Col([
-                                            dbc.Card([
-                                                dcc.Loading([
-                                                    dcc.Graph(
-                                                        figure = init_fig_spread, id='spread',
-                                                        style = {'height':'65vh', 'width':'45vw'}
-                                                    )],
-                                                    color="blue",
-                                                    type="default",
+                                        dbc.Row([
+                                                dbc.Col(
+                                                    ["Object spread in q-u space"],
+                                                    style = {'height':'8vh'},
+                                                    class_name = "d-flex fs-5 fw-bold text-uppercase align-items-center justify-content-start"
                                                 ),
-                                            ]),
-                                        ], className = "d-flex-inline p-0 ms-2 align-content-around justify-content-center"),
-                                        ########################
-                                        dbc.Col([
+                                            ],class_name= "d-flex w-100 justify-content-center align-items-center"
+                                        ),
 
-                                            dbc.Row([
-                                                dbc.Col([
-                                                    dbc.Card([
-                                                        dcc.Loading(
-                                                            children = [dcc.Graph(figure = init_fig_u, id='polarimetry_u',style = {'height':'30vh', 'width':'45vw'}),],
-                                                            # color="black",
-                                                            type="default",
-                                                        ),
-                                                    ], class_name = 'd-flex border border-tertiary m-0 p-0'),
-                                                ],class_name = 'd-flex h-100 align-items-center justify-content-center m-0 p-0')
-                                            ],style = {'height':'35vh'},className = 'd-flex align-items-center justify-content-center m-0 p-0'),
+                                        ##########################################
+                                        dbc.Row([
+                                                dbc.Col(
+                                                    ["Object ID : "],
+                                                    style = {'height':'8vh'},
+                                                    width = 'auto',
+                                                    class_name = "d-flex fs-5 fw-bold text-uppercase align-items-center justify-content-start"
+                                                ),
 
-                                            dbc.Row([
                                                 dbc.Col([
-                                                    dbc.Card([
-                                                        dcc.Loading(
-                                                            children = [dcc.Graph(figure = init_fig_q, id='polarimetry_q',style = {'height':'30vh', 'width':'45vw'}),],
-                                                            color="black",
-                                                            type="default",
+                                                        dbc.Select(
+                                                            id = 'chip_input',
+                                                            options=chiplist,
+                                                            value = init_chip,                                                      
                                                         ),
-                                                    ], class_name = 'd-flex border border-info m-0 p-0'),
-                                                ],class_name = 'd-flex h-100 align-items-center justify-content-center m-0 p-0')
-                                            ],style = {'height':'35vh'},className = 'd-flex align-items-center justify-content-center m-0 p-0'),
-                                        
-                                        ], class_name = "d-flex-inline h-100 w-50 flex-wrap justify-content-between align-content-center p-0 m-0"),
-                                        ########################
-                                    ],style = {'height':'70vh',}, class_name = 'd-flex w-100 justify-content-evenly align-content-evenly p-0 m-0'),
-                                ], style = {'height':'auto'},class_name = 'd-flex flex-wrap justify-content-center align-items-center p-0 m-0'),
-                            ], style = {'height':'auto',},class_name = 'd-flex w-100 pt-1 m-0 pb-1 mt-2 justify-content-center border border-3 border-primary rounded-2 align-items-center'),
+                                                    ],
+                                                    class_name='d-flex m-0 ps-1 pe-1 pt-1 pb-1',
+                                                ),
+
+                                                dbc.Col([
+                                                        dbc.Select(
+                                                            id = 'pos_input',
+                                                            options=poslist,
+                                                            value = init_pos,                                                        
+                                                        ),
+                                                    ],
+                                                    class_name='d-flex m-0 ps-1 pe-1 pt-1 pb-1',
+                                                ),
+
+                                                dbc.Col([
+                                                        dbc.Input(
+                                                            id = 'row_index_input',
+                                                            type = 'number',
+                                                            value = init_rowindex,                                                        
+                                                        ),
+                                                    ],
+                                                    class_name='d-flex m-0 ps-1 pe-1 pt-1 pb-1',
+                                                ),
+
+                                                dbc.Col([
+                                                        dbc.Input(
+                                                            id = 'iloc_input',
+                                                            type = 'number',
+                                                            placeholder = 'current index : 0',                                                        
+                                                        ),
+                                                    ],
+                                                    class_name='d-flex m-0 ps-1 pe-1 pt-1 pb-1',
+                                                ),
+
+                                                dbc.Col([
+                                                    dbc.Button('Submit', id='submit_button',n_clicks=0, class_name='w-100')],
+                                                    class_name = 'd-flex justify-content-center m-0 p-1'
+                                                ),
+
+                                            ],
+                                            class_name= "d-flex w-100 justify-content-center border-top border-bottom border-2 align-items-center "
+                                        ),
+
+                                        #####################################
+
+                                        dbc.Row(
+                                            [
+                                            ########################
+                                            dbc.Col(
+                                                [
+                                                    html.Div(
+                                                        [
+                                                            dbc.Card(
+                                                                [
+                                                                    dcc.Loading(
+                                                                        dcc.Graph(
+                                                                            figure = init_fig_spread,
+                                                                            id='spread',
+                                                                            style = {'height':'100%', 'width':'100%'}
+                                                                        ),
+                                                                        color='rgba(109, 49, 128, 0.8)',
+                                                                        parent_style = {'height':'100%', 'width':'100%',},
+                                                                        type="default",
+                                                                    ),
+                                                                ],
+                                                                class_name = 'd-flex h-100 w-100'
+                                                            ),
+                                                        ],
+                                                        className = 'd-flex h-100 p-0 m-0 border border-1 border-primary text-uppercase',
+                                                    ),
+                                                    html.Div(
+                                                        [
+                                                            html.Div(
+                                                                [
+                                                                    dbc.Card(
+                                                                        [
+                                                                            dcc.Loading(
+                                                                                dcc.Graph(
+                                                                                    figure = init_fig_u,
+                                                                                    id='polarimetry_u',
+                                                                                    style = {'height':'100%', 'width':'100%'}
+                                                                                ),
+                                                                                color='rgba(109, 49, 128, 0.8)',
+                                                                                parent_style = {'height':'100%', 'width':'100%',},
+                                                                                type="default",
+                                                                            ),
+                                                                        ],
+                                                                        class_name = 'd-flex h-100 w-100'
+                                                                    ),
+                                                                ],
+                                                                style = {'height':'49%'},
+                                                                className = 'd-flex p-0 m-0 border border-1 border-success text-uppercase',
+                                                            ),
+                                                            html.Div(
+                                                                [
+                                                                    dbc.Card(
+                                                                        [
+                                                                            dcc.Loading(
+                                                                                dcc.Graph(
+                                                                                    figure = init_fig_q,
+                                                                                    id='polarimetry_q',
+                                                                                    style = {'height':'100%', 'width':'100%'}
+                                                                                ),
+                                                                                color='rgba(109, 49, 128, 0.8)',
+                                                                                parent_style = {'height':'100%', 'width':'100%',},
+                                                                                type="default",
+                                                                            ),
+                                                                        ],
+                                                                        class_name = 'd-flex h-100 w-100'
+                                                                    ),
+                                                                ],
+                                                                style = {'height':'49%'},
+                                                                className = 'd-flex p-0 m-0 border border-1 border-success text-uppercase',
+                                                            ),
+                                                        ],
+                                                        style = {'height':'100%',},
+                                                        className = 'd-flex flex-column p-0 m-0',
+                                                    ),
+                                                ],
+                                                style = {'height':'70vh','width':'100%'},
+                                                class_name = "d-flex flex-column flex-lg-row p-0 m-0 border border-1 border-secondary justify-content-center",
+                                            ),
+                                            ########################
+                                            # dbc.Col(
+                                            #     [
+                                            #         html.Div(
+                                            #             [
+                                            #                 dbc.Card(
+                                            #                     [
+                                            #                         dcc.Loading(
+                                            #                             dcc.Graph(
+                                            #                                 figure = init_fig_u,
+                                            #                                 id='polarimetry_u',
+                                            #                                 style = {'height':'100%', 'width':'100%'}
+                                            #                             ),
+                                            #                             color='rgba(109, 49, 128, 0.8)',
+                                            #                             parent_style = {'height':'100%', 'width':'100%',},
+                                            #                             type="default",
+                                            #                         ),
+                                            #                     ],
+                                            #                     class_name = 'd-flex h-100 w-100'
+                                            #                 ),
+                                            #             ],
+                                            #             style = {'height':'49%'},
+                                            #             className = 'd-flex p-0 m-0 border border-1 border-success text-uppercase',
+                                            #         ),
+                                            #         html.Div(
+                                            #             [
+                                            #                 dbc.Card(
+                                            #                     [
+                                            #                         dcc.Loading(
+                                            #                             dcc.Graph(
+                                            #                                 figure = init_fig_q,
+                                            #                                 id='polarimetry_q',
+                                            #                                 style = {'height':'100%', 'width':'100%'}
+                                            #                             ),
+                                            #                             color='rgba(109, 49, 128, 0.8)',
+                                            #                             parent_style = {'height':'100%', 'width':'100%',},
+                                            #                             type="default",
+                                            #                         ),
+                                            #                     ],
+                                            #                     class_name = 'd-flex h-100 w-100'
+                                            #                 ),
+                                            #             ],
+                                            #             style = {'height':'49%'},
+                                            #             className = 'd-flex p-0 m-0 border border-1 border-success text-uppercase',
+                                            #         ),
+                                            #         # dbc.Row(
+                                            #         #     dbc.Col(
+                                            #                 # dbc.Card([
+                                            #                         # dcc.Loading(
+                                            #                         #     children = [dcc.Graph(
+                                            #                         #         figure = init_fig_u,
+                                            #                         #         id='polarimetry_u',
+                                            #                         #         style = {'height':'100%', 'width':'100%'}
+                                            #                         #         ),
+                                            #                         #     ],
+                                            #                         #     color='rgba(109, 49, 128, 0.8)',
+                                            #                         #     parent_style = {'height':'100%', 'width':'100%',},
+                                            #                         #     type="default",
+                                            #                         # ),
+                                            #                     # ],
+                                            #                     # style = {'height':'100%', 'width':'100%'},
+                                            #                 #     class_name = 'd-flex align-items-center m-0 p-0'
+                                            #                 # ),                                                    
+                                            #         #         class_name = 'd-flex m-1 border border-1 align-items-center justify-content-center'
+                                            #         #     ),
+                                            #         # class_name = 'd-flex border border-1 align-items-center m-0 p-0',
+                                            #         # ),
+                                            #         # dbc.Row(
+                                            #         #     dbc.Col(
+                                            #                 # dbc.Card([
+                                            #                         # dcc.Loading(
+                                            #                         #     children = [dcc.Graph(
+                                            #                         #         figure = init_fig_q,
+                                            #                         #         id='polarimetry_q',
+                                            #                         #         style = {'height':'100%', 'width':'100%'}
+                                            #                         #         ),
+                                            #                         #     ],
+                                            #                         #     color='rgba(109, 49, 128, 0.8)',
+                                            #                         #     parent_style = {'height':'100%', 'width':'100%',},
+                                            #                         #     type="default",
+                                            #                         # ),
+                                            #                     # ],
+                                            #                     # style = {'height':'100%', 'width':'100%'},
+                                            #                 #     class_name = 'd-flex align-items-center m-0 p-0'
+                                            #                 # ),                                                    
+                                            #         #         class_name = 'd-flex m-1 border border-1 align-items-center justify-content-center'
+                                            #         #     ),
+                                            #         # class_name = 'd-flex border border-1 align-items-center m-0 p-0',
+                                            #         # ),
+
+
+
+                                            #     ],
+                                            #     style = {'height':'70vh','width':'50%'},
+                                            #     class_name = "d-flex flex-column border border-1 border-info justify-content-between align-content-between p-0 m-0",
+                                            # ),
+                                            ########################
+                                            ],
+                                            style = {'height':'70vh',},
+                                            class_name = 'd-flex justify-content-evenly align-content-evenly p-0 m-1',
+                                        ),
+                                    ],
+                                    style = {'height':'auto'},
+                                    class_name = 'd-flex flex-column justify-content-center align-items-center p-0 m-1'
+                                ),
+                                ],
+                                style = {'height':'auto',},
+                                class_name = 'd-flex w-100 pt-0 m-0 pb-0 mt-2 justify-content-center border border-3 border-primary rounded-2 align-items-between'
+                            ),
                             ###################################
 
                             # rotated plots
@@ -829,7 +980,6 @@ def serve_layout():
                             dbc.Row([
                                 ########################
                                 dbc.Col([
-
                                     # dbc.Row([
                                         # dbc.Col([
                                             dbc.Card([
@@ -942,17 +1092,17 @@ def update_figs(spread_clickdata,refresh_clicks,submit_clicks,\
                 global_df_rotated, global_rotated_rows, global_rotated_cols, global_df_filtered, global_filtered_rows, global_filtered_cols, global_qudict, global_df_binned, global_df_statedict, global_object_statedict):
 
     
-    # print("triggered by element with id : {}".format(dash.callback_context.triggered_id))
-    # print("triggered: {}".format(format(dash.callback_context.triggered)))
+    print("triggered by element with id : {}".format(dash.callback_context.triggered_id))
+    print("triggered: {}".format(format(dash.callback_context.triggered)))
 
     # firstrun: get df, expand, and plot
     if dash.callback_context.triggered_id is None:
-        # print("all initial setup is done in the local page file serverside")
+        print("all initial setup is done in the local page file serverside")
         raise PreventUpdate
     
     # if global stores are empty
     if (refresh_clicks == 0) and any([kw is None for kw in [global_df_rotated, global_rotated_rows, global_rotated_cols, global_df_filtered, global_filtered_rows, global_filtered_cols,global_qudict, global_df_binned, global_df_statedict, global_object_statedict]]):
-        # print("populating datasets")
+        print("populating datasets")
         # print("Nones : {}".format([kw is None for kw in [global_df_rotated, global_rotated_rows, global_rotated_cols, global_df_filtered, global_filtered_rows, global_filtered_cols,\
                                                         #  global_qudict, global_df_binned, global_df_statedict, global_object_statedict]]))
         # run calcs
@@ -993,7 +1143,7 @@ def update_figs(spread_clickdata,refresh_clicks,submit_clicks,\
 
     # if refresh clicked
     if (dash.callback_context.triggered_id == 'refresh_button') and (refresh_clicks > 0):
-        # print('refresh clicked',refresh_clicks)
+        print('refresh clicked',refresh_clicks)
 
         # run calcs
         df_stats = calc_scstats_and_avgphil(t_input,sig_input)
@@ -1031,7 +1181,7 @@ def update_figs(spread_clickdata,refresh_clicks,submit_clicks,\
 
     # if submit clicked
     elif (dash.callback_context.triggered_id == 'submit_button') and (submit_clicks > 0):
-        # print('submit clicked',submit_clicks)
+        print('submit clicked',submit_clicks)
         df_filtered, df_binned_stats = read_from_store_wrapper(global_df_filtered, rows = jsontomind(global_filtered_rows, rows = True), cols = jsontomind(global_filtered_cols), levels = 1),\
             read_from_store_wrapper(global_df_binned, levels = 1)
         # print(df_filtered)
@@ -1077,7 +1227,7 @@ def update_figs(spread_clickdata,refresh_clicks,submit_clicks,\
 
     # if spread clicked
     elif (dash.callback_context.triggered_id == 'spread') and (spread_clickdata is not None):
-        # print('clickdata triggered', spread_clickdata)
+        print('clickdata triggered', spread_clickdata)
         filtered_row_names = jsontomind(global_filtered_rows, rows = True)
         filtered_col_names = jsontomind(global_filtered_cols)
         # print("after: \n",pd.MultiIndex.from_arrays(np.array(global_filtered_rows)),pd.MultiIndex.from_arrays(np.array(global_filtered_cols)))
@@ -1110,7 +1260,7 @@ def update_figs(spread_clickdata,refresh_clicks,submit_clicks,\
         dict_dfbinned = df_binned_stats.to_dict()
 
     else:
-        # print("probably a recursive primary trigger because of external store inputs / unknown reason")
+        print("probably a recursive primary trigger because of external store inputs / unknown reason")
         raise PreventUpdate
 
     # chip_output, pos_output, row_index_output, spread_clickdata_output = chip_plot, pos_plot, rowindex_plot, spread_clickdata_plot
