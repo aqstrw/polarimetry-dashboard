@@ -7567,6 +7567,11 @@ textarea.form-control-lg {
   border-color: rgba(var(--bs-success-rgb), var(--bs-border-opacity)) !important;
 }
 
+.border-babyblue {
+  --bs-border-opacity: 1;
+  border-color: rgba(5, 53, 201, 1) !important;
+}
+
 .border-info {
   --bs-border-opacity: 1;
   border-color: rgba(var(--bs-info-rgb), var(--bs-border-opacity)) !important;
@@ -12469,10 +12474,10 @@ textarea.form-control-lg {
   color: #fff;
 }
 .card.border-info .text-muted {
-  color: rgba(255, 255, 255, 0.7) !important;
+  color: rgba(57, 203, 251, 0.8) !important;
 }
 .card.border-info .card-header {
-  background-color: #39cbfb !important;
+  background-color: rgba(57, 203, 251, 0.8) !important;
   border-bottom: none;
 }
 .card.border-warning {

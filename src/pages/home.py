@@ -800,11 +800,11 @@ def serve_layout():
                                                                         type="default",
                                                                     ),
                                                                 ],
-                                                                class_name = 'd-flex h-100 w-100'
+                                                                class_name = 'd-flex h-100 w-100',
                                                             ),
                                                         ],
                                                         style = {'height':'70vh'},
-                                                        className = 'd-flex w-100 p-0 m-0 border border-1 border-primary text-uppercase',
+                                                        className = 'd-flex w-100 p-0 me-1',
                                                     ),
                                                     html.Div(
                                                         [
@@ -823,11 +823,11 @@ def serve_layout():
                                                                                 type="default",
                                                                             ),
                                                                         ],
-                                                                        class_name = 'd-flex h-100 w-100'
+                                                                        class_name = 'd-flex border border-2 border-info h-100 w-100'
                                                                     ),
                                                                 ],
                                                                 style = {'height':'49%'},
-                                                                className = 'd-flex p-0 m-0 w-100 border border-1 border-success text-uppercase',
+                                                                className = 'd-flex p-0 m-0 w-100',
                                                             ),
                                                             html.Div(
                                                                 [
@@ -844,11 +844,11 @@ def serve_layout():
                                                                                 type="default",
                                                                             ),
                                                                         ],
-                                                                        class_name = 'd-flex h-100 w-100'
+                                                                        class_name = 'd-flex h-100 w-100 border border-2 border-tertiary'
                                                                     ),
                                                                 ],
                                                                 style = {'height':'49%'},
-                                                                className = 'd-flex p-0 m-0 w-100 border border-1 border-success text-uppercase',
+                                                                className = 'd-flex p-0 m-0 w-100',
                                                             ),
                                                         ],
                                                         style = {'height':'70vh',},
@@ -856,11 +856,11 @@ def serve_layout():
                                                     ),
                                                 ],
                                                 style = {'height':'auto','width':'100%'},
-                                                class_name = "d-flex flex-column flex-lg-row p-0 m-0 border border-1 border-secondary justify-content-center",
+                                                class_name = "d-flex flex-column flex-lg-row p-0 mt-1 mb-1 justify-content-center",
                                             ),
                                             ],
                                             style = {'height':'auto','width':'100%'},
-                                            class_name = 'd-flex justify-content-evenly border border-danger align-content-evenly p-0 m-0',
+                                            class_name = 'd-flex justify-content-evenly align-content-evenly p-0 m-0',
                                         ),
                                     ],
                                     style = {'height':'100%'},
@@ -873,44 +873,83 @@ def serve_layout():
                             ###################################
 
                             # rotated plots
-                            dbc.Row([
-                                dbc.Col(
-                                    ["Polarimetry aligned with the object vs Ellipticity"],
-                                    style = {'height':'auto'},
-                                    class_name = "d-flex fs-5 fw-bold text-uppercase pt-2 pb-2 align-items-center justify-content-start"
-                                ),
-                            ],class_name= "d-flex w-100 justify-content-center align-items-center "),
 
                             dbc.Row([
-                                ########################
                                 dbc.Col([
-                                    # dbc.Row([
-                                        # dbc.Col([
-                                            dbc.Card([
-                                                dcc.Loading(
-                                                    children = [dcc.Graph(figure = init_figq_rotated, id='rotated_qvsell',style = {'height':'30vh', 'width':'45vw'}),],
-                                                    color="black",
-                                                    type="default",
+                                        dbc.Row([
+                                                dbc.Col(
+                                                    ["Polarimetry aligned with the object vs Ellipticity"],
+                                                    style = {'height':'8vh'},
+                                                    class_name = "d-flex fs-5 fw-bold text-uppercase align-items-center justify-content-start"
                                                 ),
-                                            ], class_name = 'd-flex-inline border-start border-info border-5 m-0 p-0'),
-                                        # ],class_name = 'd-flex h-100 align-items-center justify-content-center m-0 p-0')
-                                    # ],style = {'height':'45vh'},className = 'd-flex align-items-center justify-content-center border border-info m-0 p-0'),
+                                            ],class_name= "d-flex w-100 justify-content-center align-items-center"
+                                        ),
 
-                                    # dbc.Row([
-                                        # dbc.Col([
-                                            dbc.Card([
-                                                dcc.Loading(
-                                                    children = [dcc.Graph(figure = init_figu_rotated, id='rotated_uvsell',style = {'height':'30vh', 'width':'45vw'}),],
-                                                    color="black",
-                                                    type="default",
-                                                ),
-                                            ], class_name = 'd-flex-inline border-start border-primary border-5 m-0 p-0'),
-                                        # ],class_name = 'd-flex h-100 align-items-center justify-content-center m-0 p-0')
-                                    # ],style = {'height':'45vh'},className = 'd-flex align-items-center justify-content-center border border-danger m-0 p-0'),
-                                
-                                ], class_name = "d-flex h-100 w-100 flex-wrap justify-content-around align-items-center border border-primary p-0 m-0"),
-                                ########################
-                            ],style = {'height':'35vh',}, class_name = 'd-flex h-100 w-100 border border-success p-0 m-0'),
+                                        #####################################
+
+                                        dbc.Row(
+                                            [
+                                            ########################
+                                            dbc.Col(
+                                                [
+                                                    html.Div(
+                                                        [
+                                                            dbc.Card(
+                                                                [
+                                                                    dcc.Loading(
+                                                                        dcc.Graph(
+                                                                            figure = init_figu_rotated,
+                                                                            id='rotated_uvsell',
+                                                                            style = {'height':'100%', 'width':'100%'}
+                                                                        ),
+                                                                        color='rgba(109, 49, 128, 0.8)',
+                                                                        parent_style = {'height':'100%', 'width':'100%',},
+                                                                        type="default",
+                                                                    ),
+                                                                ],
+                                                                class_name = 'd-flex border border-2 border-info h-100 w-100'
+                                                            ),
+                                                        ],
+                                                        style = {'width':'97%'},
+                                                        className = 'd-flex flex-shrink-1 p-0 m-1',
+                                                    ),
+                                                    html.Div(
+                                                        [
+                                                            dbc.Card(
+                                                                [
+                                                                    dcc.Loading(
+                                                                        dcc.Graph(
+                                                                            figure = init_figq_rotated,
+                                                                            id='rotated_qvsell',
+                                                                            style = {'height':'100%', 'width':'100%'}
+                                                                        ),
+                                                                        color='rgba(109, 49, 128, 0.8)',
+                                                                        parent_style = {'height':'100%', 'width':'100%',},
+                                                                        type="default",
+                                                                    ),
+                                                                ],
+                                                                class_name = 'd-flex h-100 w-100 border border-2 border-tertiary'
+                                                            ),
+                                                        ],
+                                                        style = {'width':'97%'},
+                                                        className = 'd-flex flex-shrink-1 p-0 m-1',
+                                                    ),
+                                                ],
+                                                style = {'height':'auto','width':'100%'},
+                                                class_name = "d-flex flex-column flex-lg-row p-0 mt-1 mb-1 justify-content-center",
+                                            ),
+                                            ],
+                                            style = {'height':'auto','width':'100%'},
+                                            class_name = 'd-flex justify-content-evenly align-content-evenly p-0 m-0',
+                                        ),
+                                    ],
+                                    style = {'height':'100%'},
+                                    class_name = 'd-flex flex-column justify-content-center align-items-center p-0 m-1'
+                                ),
+                                ],
+                                style = {'height':'auto',},
+                                class_name = 'd-flex w-100 pt-0 m-0 pb-0 mt-2 justify-content-center border border-3 border-babyblue rounded-2 align-items-between'
+                            ),
 
                         ],class_name = 'd-flex flex-wrap h-100 w-100 justify-content-center p-0 m-0'),
                     ], style={'position':'absolute','top':-60,'width':'95vw', 'padding':'0px', 'margin':'0px'}, className = "shadow-lg d-flex justify-content-center"),                
