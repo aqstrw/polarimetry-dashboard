@@ -803,7 +803,8 @@ def serve_layout():
                                                                 class_name = 'd-flex h-100 w-100'
                                                             ),
                                                         ],
-                                                        className = 'd-flex h-100 p-0 m-0 border border-1 border-primary text-uppercase',
+                                                        style = {'height':'70vh'},
+                                                        className = 'd-flex w-100 p-0 m-0 border border-1 border-primary text-uppercase',
                                                     ),
                                                     html.Div(
                                                         [
@@ -826,7 +827,7 @@ def serve_layout():
                                                                     ),
                                                                 ],
                                                                 style = {'height':'49%'},
-                                                                className = 'd-flex p-0 m-0 border border-1 border-success text-uppercase',
+                                                                className = 'd-flex p-0 m-0 w-100 border border-1 border-success text-uppercase',
                                                             ),
                                                             html.Div(
                                                                 [
@@ -847,119 +848,22 @@ def serve_layout():
                                                                     ),
                                                                 ],
                                                                 style = {'height':'49%'},
-                                                                className = 'd-flex p-0 m-0 border border-1 border-success text-uppercase',
+                                                                className = 'd-flex p-0 m-0 w-100 border border-1 border-success text-uppercase',
                                                             ),
                                                         ],
-                                                        style = {'height':'100%',},
-                                                        className = 'd-flex flex-column p-0 m-0',
+                                                        style = {'height':'70vh',},
+                                                        className = 'd-flex w-100 justify-content-between flex-column p-0 m-0',
                                                     ),
                                                 ],
-                                                style = {'height':'70vh','width':'100%'},
+                                                style = {'height':'auto','width':'100%'},
                                                 class_name = "d-flex flex-column flex-lg-row p-0 m-0 border border-1 border-secondary justify-content-center",
                                             ),
-                                            ########################
-                                            # dbc.Col(
-                                            #     [
-                                            #         html.Div(
-                                            #             [
-                                            #                 dbc.Card(
-                                            #                     [
-                                            #                         dcc.Loading(
-                                            #                             dcc.Graph(
-                                            #                                 figure = init_fig_u,
-                                            #                                 id='polarimetry_u',
-                                            #                                 style = {'height':'100%', 'width':'100%'}
-                                            #                             ),
-                                            #                             color='rgba(109, 49, 128, 0.8)',
-                                            #                             parent_style = {'height':'100%', 'width':'100%',},
-                                            #                             type="default",
-                                            #                         ),
-                                            #                     ],
-                                            #                     class_name = 'd-flex h-100 w-100'
-                                            #                 ),
-                                            #             ],
-                                            #             style = {'height':'49%'},
-                                            #             className = 'd-flex p-0 m-0 border border-1 border-success text-uppercase',
-                                            #         ),
-                                            #         html.Div(
-                                            #             [
-                                            #                 dbc.Card(
-                                            #                     [
-                                            #                         dcc.Loading(
-                                            #                             dcc.Graph(
-                                            #                                 figure = init_fig_q,
-                                            #                                 id='polarimetry_q',
-                                            #                                 style = {'height':'100%', 'width':'100%'}
-                                            #                             ),
-                                            #                             color='rgba(109, 49, 128, 0.8)',
-                                            #                             parent_style = {'height':'100%', 'width':'100%',},
-                                            #                             type="default",
-                                            #                         ),
-                                            #                     ],
-                                            #                     class_name = 'd-flex h-100 w-100'
-                                            #                 ),
-                                            #             ],
-                                            #             style = {'height':'49%'},
-                                            #             className = 'd-flex p-0 m-0 border border-1 border-success text-uppercase',
-                                            #         ),
-                                            #         # dbc.Row(
-                                            #         #     dbc.Col(
-                                            #                 # dbc.Card([
-                                            #                         # dcc.Loading(
-                                            #                         #     children = [dcc.Graph(
-                                            #                         #         figure = init_fig_u,
-                                            #                         #         id='polarimetry_u',
-                                            #                         #         style = {'height':'100%', 'width':'100%'}
-                                            #                         #         ),
-                                            #                         #     ],
-                                            #                         #     color='rgba(109, 49, 128, 0.8)',
-                                            #                         #     parent_style = {'height':'100%', 'width':'100%',},
-                                            #                         #     type="default",
-                                            #                         # ),
-                                            #                     # ],
-                                            #                     # style = {'height':'100%', 'width':'100%'},
-                                            #                 #     class_name = 'd-flex align-items-center m-0 p-0'
-                                            #                 # ),                                                    
-                                            #         #         class_name = 'd-flex m-1 border border-1 align-items-center justify-content-center'
-                                            #         #     ),
-                                            #         # class_name = 'd-flex border border-1 align-items-center m-0 p-0',
-                                            #         # ),
-                                            #         # dbc.Row(
-                                            #         #     dbc.Col(
-                                            #                 # dbc.Card([
-                                            #                         # dcc.Loading(
-                                            #                         #     children = [dcc.Graph(
-                                            #                         #         figure = init_fig_q,
-                                            #                         #         id='polarimetry_q',
-                                            #                         #         style = {'height':'100%', 'width':'100%'}
-                                            #                         #         ),
-                                            #                         #     ],
-                                            #                         #     color='rgba(109, 49, 128, 0.8)',
-                                            #                         #     parent_style = {'height':'100%', 'width':'100%',},
-                                            #                         #     type="default",
-                                            #                         # ),
-                                            #                     # ],
-                                            #                     # style = {'height':'100%', 'width':'100%'},
-                                            #                 #     class_name = 'd-flex align-items-center m-0 p-0'
-                                            #                 # ),                                                    
-                                            #         #         class_name = 'd-flex m-1 border border-1 align-items-center justify-content-center'
-                                            #         #     ),
-                                            #         # class_name = 'd-flex border border-1 align-items-center m-0 p-0',
-                                            #         # ),
-
-
-
-                                            #     ],
-                                            #     style = {'height':'70vh','width':'50%'},
-                                            #     class_name = "d-flex flex-column border border-1 border-info justify-content-between align-content-between p-0 m-0",
-                                            # ),
-                                            ########################
                                             ],
-                                            style = {'height':'70vh',},
-                                            class_name = 'd-flex justify-content-evenly align-content-evenly p-0 m-1',
+                                            style = {'height':'auto','width':'100%'},
+                                            class_name = 'd-flex justify-content-evenly border border-danger align-content-evenly p-0 m-0',
                                         ),
                                     ],
-                                    style = {'height':'auto'},
+                                    style = {'height':'100%'},
                                     class_name = 'd-flex flex-column justify-content-center align-items-center p-0 m-1'
                                 ),
                                 ],
