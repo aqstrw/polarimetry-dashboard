@@ -775,7 +775,7 @@ def serve_layout():
                                                 ),
 
                                             ],
-                                            class_name= "d-flex w-100 justify-content-center border-top border-bottom border-2 align-items-center "
+                                            class_name= "d-flex flex-column flex-lg-row w-100 justify-content-center border-top border-bottom border-2 align-items-center "
                                         ),
 
                                         #####################################
@@ -804,7 +804,7 @@ def serve_layout():
                                                             ),
                                                         ],
                                                         style = {'height':'70vh'},
-                                                        className = 'd-flex w-100 p-0 me-1',
+                                                        className = 'd-flex w-100 p-0 m-0',
                                                     ),
                                                     html.Div(
                                                         [
@@ -826,8 +826,8 @@ def serve_layout():
                                                                         class_name = 'd-flex border border-2 border-info h-100 w-100'
                                                                     ),
                                                                 ],
-                                                                style = {'height':'49%'},
-                                                                className = 'd-flex p-0 m-0 w-100',
+                                                                # style = {'height':'49%'},
+                                                                className = 'd-flex p-0 m-0 h-100 w-100',
                                                             ),
                                                             html.Div(
                                                                 [
@@ -847,23 +847,23 @@ def serve_layout():
                                                                         class_name = 'd-flex h-100 w-100 border border-2 border-tertiary'
                                                                     ),
                                                                 ],
-                                                                style = {'height':'49%'},
-                                                                className = 'd-flex p-0 m-0 w-100',
+                                                                # style = {'height':'49%'},
+                                                                className = 'd-flex p-0 m-0 h-100 w-100',
                                                             ),
                                                         ],
-                                                        style = {'height':'70vh',},
+                                                        style = {'height':'70vh','gap':'1%'},
                                                         className = 'd-flex w-100 justify-content-between flex-column p-0 m-0',
                                                     ),
                                                 ],
-                                                style = {'height':'auto','width':'100%'},
+                                                style = {'height':'auto','width':'100%', 'gap':'1%'},
                                                 class_name = "d-flex flex-column flex-lg-row p-0 mt-1 mb-1 justify-content-center",
                                             ),
                                             ],
                                             style = {'height':'auto','width':'100%'},
-                                            class_name = 'd-flex justify-content-evenly align-content-evenly p-0 m-0',
+                                            class_name = 'd-flex justify-content-between align-content-between p-0 m-0',
                                         ),
                                     ],
-                                    style = {'height':'100%'},
+                                    style = {'height':'auto'},
                                     class_name = 'd-flex flex-column justify-content-center align-items-center p-0 m-1'
                                 ),
                                 ],
@@ -910,8 +910,8 @@ def serve_layout():
                                                                 class_name = 'd-flex border border-2 border-info h-100 w-100'
                                                             ),
                                                         ],
-                                                        style = {'width':'97%'},
-                                                        className = 'd-flex flex-shrink-1 p-0 m-1',
+                                                        # style = {'width':'90%'},
+                                                        className = 'd-flex p-0 m-0 w-100',
                                                     ),
                                                     html.Div(
                                                         [
@@ -931,19 +931,19 @@ def serve_layout():
                                                                 class_name = 'd-flex h-100 w-100 border border-2 border-tertiary'
                                                             ),
                                                         ],
-                                                        style = {'width':'97%'},
-                                                        className = 'd-flex flex-shrink-1 p-0 m-1',
+                                                        # style = {'width':'90%'},
+                                                        className = 'd-flex p-0 m-0 w-100',
                                                     ),
                                                 ],
-                                                style = {'height':'auto','width':'100%'},
-                                                class_name = "d-flex flex-column flex-lg-row p-0 mt-1 mb-1 justify-content-center",
+                                                style = {'height':'auto','width':'100%', 'gap':'1%'},
+                                                class_name = "d-flex flex-column flex-lg-row p-0 mt-1 mb-1 justify-content-between",
                                             ),
                                             ],
                                             style = {'height':'auto','width':'100%'},
                                             class_name = 'd-flex justify-content-evenly align-content-evenly p-0 m-0',
                                         ),
                                     ],
-                                    style = {'height':'100%'},
+                                    style = {'height':'auto'},
                                     class_name = 'd-flex flex-column justify-content-center align-items-center p-0 m-1'
                                 ),
                                 ],
