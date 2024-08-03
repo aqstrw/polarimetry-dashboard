@@ -202,7 +202,7 @@ def make_stats_scatter(c,p,ri,df_reset):
     counts, bins = np.histogram(df_reset['q_scm'][df_reset['q_scm'].between(-0.3,0.3)], bins='sqrt')
     # print(bins)
     bins = 0.5 * (bins[:-1] + bins[1:])
-    fig_xhist = px.bar(x=bins, y=counts, text_auto = True, opacity = 0.5,color_discrete_sequence=['white'])
+    fig_xhist = px.bar(x=bins, y=counts, text_auto = True, opacity = 1,color_discrete_sequence=['rgba(213, 86, 135, 1)'])
 
     fig_xhist.update_layout(
         plot_bgcolor='rgba(0, 0, 0, 0)',
@@ -227,7 +227,8 @@ def make_stats_scatter(c,p,ri,df_reset):
     counts, bins = np.histogram(df_reset['u_scm'][df_reset['u_scm'].between(-0.3,0.3)], bins='sqrt')
     # print(bins)
     bins = 0.5 * (bins[:-1] + bins[1:])
-    fig_yhist = px.bar(y=bins, x=counts, orientation='h')
+    fig_yhist = px.bar(y=bins, x=counts, orientation='h', text_auto = True, opacity = 1,color_discrete_sequence=['rgba(57, 203, 251, 1)'])
+    fig_yhist.update_traces(textfont = dict(color = ['red']))
     fig_yhist.update_layout(
         plot_bgcolor='rgba(0, 0, 0, 0)',
         paper_bgcolor='rgba(0,0,0,0)',
@@ -255,7 +256,7 @@ def make_stats_scatter(c,p,ri,df_reset):
         y ='u_scm',
         color='ell_bins',
         custom_data=['CHIP','POS','row_index'],
-        color_discrete_sequence = plotly.colors.cyclical.Edge,
+        # color_discrete_sequence = plotly.colors.cyclical.Edge,
         )
     # figspread.update_layout(xaxis=dict(scaleanchor='y', scaleratio=1))
     figspread.update_traces(marker=dict(size=3))
@@ -463,6 +464,7 @@ def make_trendplot(df_reset,dfstats):
         # trendline_options = dict(frac=1),
         # height=1500,
     )
+    figq.update_traces(marker=dict(size=3.5))
     # fig1.show()
 
     figu = px.scatter(
@@ -477,9 +479,9 @@ def make_trendplot(df_reset,dfstats):
         # height=50,
         # showlegend = False
     )
-
-    fig_qyerr = px.scatter(dfstats, x="x_center", y="q_wa",error_y="weighted_err_q",color_discrete_sequence = ['black'])
-    fig_uyerr = px.scatter(dfstats, x="x_center", y="u_wa",error_y="weighted_err_u",color_discrete_sequence = ['black'])
+    figu.update_traces(marker=dict(size=3.5))
+    fig_qyerr = px.scatter(dfstats, x="x_center", y="q_wa",error_y="weighted_err_q",color_discrete_sequence = ['white'])
+    fig_uyerr = px.scatter(dfstats, x="x_center", y="u_wa",error_y="weighted_err_u",color_discrete_sequence = ['white'])
 
     figq.add_trace(fig_qyerr["data"][0], col = 1, row = 1,)
 
@@ -575,18 +577,19 @@ init_qudict = get_qudf(init_chip, init_pos, init_rowindex, init_df_filtered)
 
 # # make init plots
 init_fig_spread = make_stats_scatter(init_chip, init_pos, init_rowindex, init_df_filtered['across_offsets'])
+init_count = init_df_filtered.shape[0]
 init_figq_rotated, init_figu_rotated = make_trendplot(init_df_filtered['across_offsets'],init_df_binned_stats)
 init_fig_q = make_individ_stats_fig('q', init_chip, init_pos, init_rowindex, init_sigexp, init_qudict, init_df_filtered['across_offsets'])
 init_fig_u = make_individ_stats_fig('u', init_chip, init_pos, init_rowindex, init_sigexp, init_qudict, init_df_filtered['across_offsets'])
-# dummy = dict(name='ambar', lastname = 'qadeer')
-# print(json.dumps(dummy))
+
 
 #################################################
 ###################################################
 dash.register_page(__name__, path='/', name = 'Home')
 
 def serve_layout():
-    return dbc.Container(fluid = True,
+    return dbc.Container(
+                fluid = True,
                 children = [
                     dbc.Row([
                         dbc.Col([
@@ -605,23 +608,37 @@ def serve_layout():
 
                                     # Filters
                                     dbc.Row([
-                                        dbc.Col(
-                                            ["Data Filters"],
-                                            style = {'height':'auto'},
-                                            class_name = "d-flex fs-5 fw-bold pt-1 pb-1 text-uppercase align-items-center justify-content-start"
+                                        dbc.Col([
+                                            html.Div(
+                                                [
+                                                    "Data Filters",
+                                                ],
+                                                style = {'height':'auto'},
+                                                className = "d-flex fs-5 fw-bold pt-1 pb-1 text-uppercase align-items-center justify-content-start"
+                                            ),
+                                            html.P("These filters can be used to select objects which are \
+                                                   included in the analysis and to setup the analysis, hover over parameter name for more information.\
+                                                   Click on button to apply changes.",
+                                                style = {'height':'auto','width':'100%',},
+                                                className = 'd-flex align-items-start justify-content-start text-start'
+                                            ),
+                                            ],
+                                            class_name= "d-flex flex-column w-100 justify-content-start align-items-start",
                                         ),
-                                    ],class_name= "d-flex w-100 justify-content-center align-items-center"),
+                                        ],
+                                        class_name= "d-flex w-100 justify-content-center align-items-center",
+                                    ),
 
                                     dbc.Row([
                                         ######################################
                                         dbc.Col([
                                             dbc.Card([
-                                                dbc.Row(["Select source:",html.Hr(className='mt-2')],style = {'height':'6vh',}, class_name = 'd-flex justify-content-start p-1 ps-2'),
+                                                dbc.Row(["Setup object analysis:",html.Hr(className='mt-2')],style = {'height':'6vh',}, class_name = 'd-flex justify-content-start p-1 ps-2'),
                                                 dbc.Row([
                                                     dbc.InputGroup(
                                                         [
                                                             
-                                                            dbc.InputGroupText(["Apperture scale"], class_name='text-wrap text-start'),
+                                                            dbc.InputGroupText(["Apperture scale"],id = 'ig_t',class_name='text-wrap text-start'),
                                                             dbc.Select(
                                                                 id = 't_input',
                                                                 options=[
@@ -629,20 +646,37 @@ def serve_layout():
                                                                 ],
                                                                 value = init_t,
                                                             ),
-                                                        ], class_name='m-0 ps-2 pe-2 pt-1 pb-1',
-                                                    )
+                                                        ],
+                                                        class_name='m-0 ps-2 pe-2 pt-1 pb-1',
+                                                    ),
+                                                    dbc.Tooltip(
+                                                        "apperture scaling factor: scales the elliptical apperture used for polarimetry",
+                                                        target="ig_t",
+                                                        placement = 'top',
+                                                        flip = True,
+                                                        delay = {'show':'500', 'hide':'50'},
+                                                        autohide = False,
+                                                    ),
                                                 ],class_name = 'd-flex justify-content-center'),
                                                 dbc.Row([
                                                     dbc.InputGroup(
                                                         [
                                                             
-                                                            dbc.InputGroupText(["Sigma"],),
+                                                            dbc.InputGroupText(["Sigma"],id = 'ig_sigma',),
                                                             dbc.Select(
                                                                 id = 'sig_input',
                                                                 options=[1,2,3],
                                                                 value = init_sigexp
                                                             ),
                                                         ], class_name='m-0 ps-2 pe-2 pt-1 pb-1',
+                                                    ),
+                                                    dbc.Tooltip(
+                                                        "standard deviation limit for sigmaclipping across offsets when averaging <q> and <u>",
+                                                        target="ig_sigma",
+                                                        placement = 'top',
+                                                        flip = True,
+                                                        delay = {'show':'500', 'hide':'50'},
+                                                        autohide = False,
                                                     ),
                                                 ],class_name = 'd-flex justify-content-center'),
                                             ],style = {'width':'100%',}, class_name = 'd-flex p-1 m-1'),
@@ -654,18 +688,34 @@ def serve_layout():
                                                 dbc.Row([
                                                     dbc.InputGroup(
                                                         [
-                                                            dbc.InputGroupText(["Min. size"],),
+                                                            dbc.InputGroupText(["Min. size"],id = 'ig_minsize'),
                                                             dbc.Input(id='npix_input', placeholder = 'minimum 20', type="number",value = init_npix),
                                                             dbc.InputGroupText("pixels"),
                                                         ], className="m-0 ps-2 pe-2 pt-1 pb-1",
+                                                    ),
+                                                    dbc.Tooltip(
+                                                        "min object size threshold to qualify for being included in the dataset",
+                                                        target="ig_minsize",
+                                                        placement = 'top',
+                                                        flip = True,
+                                                        delay = {'show':'500', 'hide':'50'},
+                                                        autohide = False,
                                                     ),
                                                 ],class_name = 'd-flex justify-content-center'),
                                                 dbc.Row([
                                                     dbc.InputGroup(
                                                         [
-                                                            dbc.InputGroupText(["Max. stdev."], style = {'width':'110px',},),
-                                                            dbc.Input(id='errorthresh_input', placeholder = 'minimum 20', type="number",required = True, value = init_errorthresh),
+                                                            dbc.InputGroupText(["Max. stdev."], id = 'ig_maxstd', style = {'width':'110px',},),
+                                                            dbc.Input(id='errorthresh_input', placeholder = 'around 0.2 helps', type="number",required = True, value = init_errorthresh),
                                                         ], className="m-0 ps-2 pe-2 pt-1 pb-1",
+                                                    ),
+                                                    dbc.Tooltip(
+                                                        "max standard deviation threshold to qualify for being included in the dataset",
+                                                        target="ig_maxstd",
+                                                        placement = 'top',
+                                                        flip = True,
+                                                        delay = {'show':'500', 'hide':'50'},
+                                                        autohide = False,
                                                     ),
                                                 ],class_name = 'd-flex justify-content-center'),
                                             ],style = {'width':'100%',}, class_name = 'd-flex p-1 m-1'),
@@ -677,16 +727,24 @@ def serve_layout():
                                                 dbc.Row([
                                                     dbc.InputGroup(
                                                         [
-                                                            dbc.InputGroupText(["Bin size"],),
+                                                            dbc.InputGroupText(["Bin size"],id = 'ig_binsize'),
                                                             dbc.Input(id='bins_input', placeholder = 'minimum 20', type="number",required = True, value = init_bins),
                                                             # dbc.InputGroupText('$\Sigma$'),
                                                         ], className="m-0 ps-2 pe-2 pt-1 pb-1",
+                                                    ),
+                                                    dbc.Tooltip(
+                                                        "size of ellipticity bins used to search for ellipticity trends",
+                                                        target="ig_binsize",
+                                                        placement = 'top',
+                                                        flip = True,
+                                                        delay = {'show':'500', 'hide':'50'},
+                                                        autohide = False,
                                                     ),
                                                 ],class_name = 'd-flex justify-content-center'),
                                                 dbc.Row([
                                                     dbc.InputGroup(
                                                         [
-                                                            dbc.InputGroupText(["Rotation Angle"], class_name='text-wrap text-start'),
+                                                            dbc.InputGroupText(["Rotation Angle"], id = 'ig_rotationangle', class_name='text-wrap text-start'),
                                                             dbc.Select(
                                                                     id = 'tk_input',
                                                                     options = ['theta','avg_phil'],
@@ -695,6 +753,14 @@ def serve_layout():
                                                             # dbc.InputGroupText('$\Sigma$'),
                                                         ], className="m-0 ps-2 pe-2 pt-1 pb-1",
                                                     ),
+                                                    dbc.Tooltip(
+                                                        "angle by which galaxies are rotated, use theta",
+                                                        target="ig_rotationangle",
+                                                        placement = 'top',
+                                                        flip = True,
+                                                        delay = {'show':'500', 'hide':'50'},
+                                                        autohide = False,
+                                                    ),
                                                 ], class_name = 'd-flex justify-content-center'),
                                             ],style = {'width':'100%',}, class_name = 'd-flex p-1 m-1'),
                                         ], class_name = 'd-flex h-100 justify-content-center align-items-center align-content-around m-0 p-0'),
@@ -702,22 +768,53 @@ def serve_layout():
                                     
                                     ######################################################
                                     dbc.Row([
-                                        dbc.Col([dbc.Button('Refresh Graphs', color = 'secondary', id='refresh_button',n_clicks=0,)],style = {'width':'auto'},class_name = 'd-flex justify-content-start'),
-                                    ], style = {'height':'auto', 'width':'auto'}, class_name= "d-flex w-100 justify-content-start p-0 m-0"),
-
-                                ], style = {'height':'auto'},class_name = 'd-flex flex-wrap justify-content-center align-items-center p-0 m-0'),
+                                        dbc.Col([
+                                                dbc.Button('Refresh dataset', color = 'secondary', id='refresh_button',n_clicks=0,),
+                                                html.Div([
+                                                        html.Div("Selected object count : ", className = 'me-1'),
+                                                        html.Div(children = init_count, id = 'div_count', className = 'd-flex fs-5 fw-bold text-center'),
+                                                    ],
+                                                    # style = {'gap':'5%'},
+                                                    className = 'd-flex flex-row bg-transparent border-0 align-items-center justify-content-between',
+                                                )
+                                            ],
+                                            style = {'width':'auto', 'gap':'1%'},
+                                            class_name = 'd-flex flex-row justify-content-start',
+                                        ),
+                                        ],
+                                        style = {'height':'auto', 'width':'auto'},
+                                        class_name= "d-flex w-100 justify-content-start p-0 m-0",
+                                    ),
+                                ], style = {'height':'auto'},class_name = 'd-flex flex-wrap justify-content-center align-items-center p-0 m-1'),
                             ], style = {'height':'auto'},class_name = 'd-flex w-100 pt-2 m-0 pb-2 justify-content-center border border-3 rounded-2 border-secondary align-items-center'),
                             #######################################################
                             
                             dbc.Row([
                                 dbc.Col([
                                         dbc.Row([
-                                                dbc.Col(
-                                                    ["Object spread in q-u space"],
-                                                    style = {'height':'8vh'},
-                                                    class_name = "d-flex fs-5 fw-bold text-uppercase align-items-center justify-content-start"
+                                                dbc.Col([
+                                                    html.Div(
+                                                        [
+                                                            "Object spread in q-u space",
+                                                        ],
+                                                        style = {'height':'auto'},
+                                                        className = "d-flex fs-5 fw-bold pt-1 pb-1 text-uppercase align-items-center justify-content-start"
+                                                    ),
+                                                    html.P("The Q vs U plot shows the distribution of objects based on degree of polarisation in specific orientations. \
+                                                           Together (when added in quadrature) these give the degree of linear polarisation. Click the scatter plot or use \
+                                                           the object ID dropdowns to focus on specific objects. The blue and pink lines highlight the selected object and map \
+                                                           to the corresponding <q> and <u> plots. Click the button the refresh the graphs.",
+                                                        style = {'height':'auto','width':'100%',},
+                                                        className = 'd-flex align-items-start justify-content-start text-start'
+                                                    ),
+                                                    ],
+                                                    class_name= "d-flex flex-column m-0 w-100 justify-content-center align-items-start",
                                                 ),
-                                            ],class_name= "d-flex w-100 justify-content-center align-items-center"
+                                                #     ["Object spread in q-u space"],
+                                                #     style = {'height':'8vh'},
+                                                #     class_name = "d-flex fs-5 fw-bold text-uppercase align-items-center justify-content-start"
+                                                # ),
+                                            ],class_name= "d-flex w-100 justify-content-start align-items-center"
                                         ),
 
                                         ##########################################
@@ -726,14 +823,24 @@ def serve_layout():
                                                     ["Object ID : "],
                                                     style = {'height':'8vh'},
                                                     width = 'auto',
-                                                    class_name = "d-flex fs-5 fw-bold text-uppercase align-items-center justify-content-start"
+                                                    class_name = "d-flex flex-row fs-5 fw-bold text-uppercase align-items-center justify-content-start"
                                                 ),
 
                                                 dbc.Col([
                                                         dbc.Select(
                                                             id = 'chip_input',
                                                             options=chiplist,
-                                                            value = init_chip,                                                      
+                                                            value = init_chip,
+                                                            persistence=True,
+                                                            persistence_type='local',                                                  
+                                                        ),
+                                                        dbc.Tooltip(
+                                                            "The FORS2 VLT is made of 2 CCD chips and this dropdown helps identify the chip that is the source of the selected object",
+                                                            target="chip_input",
+                                                            placement = 'top',
+                                                            flip = True,
+                                                            delay = {'show':'500', 'hide':'50'},
+                                                            autohide = False,
                                                         ),
                                                     ],
                                                     class_name='d-flex m-0 ps-1 pe-1 pt-1 pb-1',
@@ -743,7 +850,18 @@ def serve_layout():
                                                         dbc.Select(
                                                             id = 'pos_input',
                                                             options=poslist,
-                                                            value = init_pos,                                                        
+                                                            value = init_pos,
+                                                            persistence=True,
+                                                            persistence_type='local', 
+                                                        ),
+                                                        dbc.Tooltip(
+                                                            "Polarimetry with FORS2 VLT requires taking two exposures of the field at an offset equivalent to the slit width, \
+                                                                this dropdown helps identify the position that is the source of the selected object",
+                                                            target="pos_input",
+                                                            placement = 'top',
+                                                            flip = True,
+                                                            delay = {'show':'500', 'hide':'50'},
+                                                            autohide = False,
                                                         ),
                                                     ],
                                                     class_name='d-flex m-0 ps-1 pe-1 pt-1 pb-1',
@@ -753,7 +871,18 @@ def serve_layout():
                                                         dbc.Input(
                                                             id = 'row_index_input',
                                                             type = 'number',
-                                                            value = init_rowindex,                                                        
+                                                            value = init_rowindex,
+                                                            persistence=True,
+                                                            persistence_type='local', 
+                                                        ),
+                                                        dbc.Tooltip(
+                                                            "Each detected object was mapped to all it's occurances in a unique object table and the rwo index \
+                                                                identifies these unique objects and all their occurances across the offsets",
+                                                            target="row_index_input",
+                                                            placement = 'top',
+                                                            flip = True,
+                                                            delay = {'show':'500', 'hide':'50'},
+                                                            autohide = False,
                                                         ),
                                                     ],
                                                     class_name='d-flex m-0 ps-1 pe-1 pt-1 pb-1',
@@ -763,15 +892,37 @@ def serve_layout():
                                                         dbc.Input(
                                                             id = 'iloc_input',
                                                             type = 'number',
-                                                            placeholder = 'current index : 0',                                                        
+                                                            placeholder = 'current index : 0',
+                                                            persistence=True,
+                                                            min = 0,
+                                                            max = init_count,
+                                                            persistence_type='local', 
+                                                        ),
+                                                        dbc.Tooltip(
+                                                            "As not all row indices exist in the dataset due to filtering, the iloc or index location allows us \
+                                                                to cycle through the filtered table more easily",
+                                                            target="iloc_input",
+                                                            placement = 'top',
+                                                            flip = True,
+                                                            delay = {'show':'500', 'hide':'50'},
+                                                            autohide = False,
                                                         ),
                                                     ],
                                                     class_name='d-flex m-0 ps-1 pe-1 pt-1 pb-1',
                                                 ),
 
-                                                dbc.Col([
-                                                    dbc.Button('Submit', id='submit_button',n_clicks=0, class_name='w-100')],
-                                                    class_name = 'd-flex justify-content-center m-0 p-1'
+                                                dbc.Col(
+                                                    [
+                                                        dbc.Button(
+                                                            'Change selected object',
+                                                            id='submit_button',
+                                                            n_clicks=0,
+                                                            class_name='w-100',
+                                                            # persistence=True,
+                                                            # persistence_type='local',
+                                                        ),
+                                                    ],
+                                                    class_name = 'd-flex justify-content-center m-0 p-1',
                                                 ),
 
                                             ],
@@ -786,9 +937,20 @@ def serve_layout():
                                             dbc.Col(
                                                 [
                                                     html.Div(
-                                                        [
-                                                            dbc.Card(
+                                                        [   
+                                                            html.P(
                                                                 [
+                                                                    "The q_scm and u_scm vales represent thee sigma clipped averages of \
+                                                                    <q> and <u> values across offsets and cycles. The histograms capture the distribution\
+                                                                        of points along each axis. The plot is centered on the selected object and hovering \
+                                                                            provides exact values and errors."
+                                                                ],
+                                                                # style = {'height' : "10vh"},
+                                                                className = 'd-flex text-start align-content-center ms-2 me-2',
+                                                            ),
+                                                            dbc.Card(
+                                                                [   
+                                                                    html.H4("Sigma clipped averages of <u> and <q> across offset", className="card-title fs-6 mt-2 ms-2"),
                                                                     dcc.Loading(
                                                                         dcc.Graph(
                                                                             figure = init_fig_spread,
@@ -800,18 +962,31 @@ def serve_layout():
                                                                         type="default",
                                                                     ),
                                                                 ],
+                                                                style = {'height' : "70vh"},
                                                                 class_name = 'd-flex h-100 w-100',
                                                             ),
                                                         ],
-                                                        style = {'height':'70vh'},
-                                                        className = 'd-flex w-100 p-0 m-0',
+                                                        style = {'height':'80vh', 'gap':'1%'},
+                                                        className = 'd-flex flex-column justify-content-between w-100 p-0 m-0',
                                                     ),
+
                                                     html.Div(
                                                         [
+                                                            html.P(
+                                                                [
+                                                                    "<q> and <u> represent the degree of polarisation per pixel summed up over the apperture. \
+                                                                        Each offset produces two cycles of readings using 4 half wave plate angles each. \
+                                                                            In other words 4 exposures contribute to each point below and 16 (unless clipped \
+                                                                                or filtered) of these points give one point in the scatterplot  (blue and red)"
+                                                                ],
+                                                                # style = {'height' : "10vh"},
+                                                                className = 'd-flex text-start align-content-center ms-2 me-',
+                                                            ),
                                                             html.Div(
                                                                 [
                                                                     dbc.Card(
                                                                         [
+                                                                            html.H4("<u> by offset", className="card-title fs-6 mt-2 ms-2"),
                                                                             dcc.Loading(
                                                                                 dcc.Graph(
                                                                                     figure = init_fig_u,
@@ -826,13 +1001,14 @@ def serve_layout():
                                                                         class_name = 'd-flex border border-2 border-info h-100 w-100'
                                                                     ),
                                                                 ],
-                                                                # style = {'height':'49%'},
+                                                                # style = {'height':'70vh'},
                                                                 className = 'd-flex p-0 m-0 h-100 w-100',
                                                             ),
                                                             html.Div(
                                                                 [
                                                                     dbc.Card(
                                                                         [
+                                                                            html.H4("<q> by offset", className="card-title fs-6 mt-2 ms-2"),
                                                                             dcc.Loading(
                                                                                 dcc.Graph(
                                                                                     figure = init_fig_q,
@@ -851,7 +1027,7 @@ def serve_layout():
                                                                 className = 'd-flex p-0 m-0 h-100 w-100',
                                                             ),
                                                         ],
-                                                        style = {'height':'70vh','gap':'1%'},
+                                                        style = {'height':'80vh','gap':'1%'},
                                                         className = 'd-flex w-100 justify-content-between flex-column p-0 m-0',
                                                     ),
                                                 ],
@@ -882,7 +1058,13 @@ def serve_layout():
                                                     style = {'height':'8vh'},
                                                     class_name = "d-flex fs-5 fw-bold text-uppercase align-items-center justify-content-start"
                                                 ),
-                                            ],class_name= "d-flex w-100 justify-content-center align-items-center"
+                                                html.P("Here we rotate the Q and U planes to to align with the major and minor axis of the (elliptical) objects and using\
+                                                        the ellipticity bins, we search for a correlation between ellipticity and polarisation along the axes.",
+                                                    style = {'height':'auto','width':'100%',},
+                                                    className = 'd-flex align-items-start justify-content-start text-start'
+                                                ),
+                                            ],
+                                            class_name= "d-flex flex-column w-100 justify-content-center align-items-center",
                                         ),
 
                                         #####################################
@@ -942,6 +1124,14 @@ def serve_layout():
                                             style = {'height':'auto','width':'100%'},
                                             class_name = 'd-flex justify-content-evenly align-content-evenly p-0 m-0',
                                         ),
+                                        html.P("Prima facie, the lack of a trend here can be attributed to the fact that\
+                                                the polarimetric signal could be aligned with either the major or minor \
+                                               axis and on average cancels out. This can be accounted for by treating galaxy \
+                                               ellipticities as polarisations (they are another spin-2 quantity after all) and correlate them directly. \
+                                               The remaining work is currently underway.",
+                                            style = {'height':'auto','width':'100%',},
+                                            className = 'd-flex align-items-start justify-content-start text-start'
+                                        ),
                                     ],
                                     style = {'height':'auto'},
                                     class_name = 'd-flex flex-column justify-content-center align-items-center p-0 m-1'
@@ -950,10 +1140,9 @@ def serve_layout():
                                 style = {'height':'auto',},
                                 class_name = 'd-flex w-100 pt-0 m-0 pb-0 mt-2 justify-content-center border border-3 border-babyblue rounded-2 align-items-between'
                             ),
-
                         ],class_name = 'd-flex flex-wrap h-100 w-100 justify-content-center p-0 m-0'),
-                    ], style={'position':'absolute','top':-60,'width':'95vw', 'padding':'0px', 'margin':'0px'}, className = "shadow-lg d-flex justify-content-center"),                
-                ], style={'width':'100vw', 'padding':'0px', 'margin':'0px'}, className = "position-absolute d-flex justify-content-center",
+                    ], style={'width':'95vw', 'padding':'0px', 'margin':'0px'}, className = "shadow-lg d-flex justify-content-center"),                
+                ], style={'width':'100vw', 'padding':'0px', 'margin':'0px'}, className = "d-flex justify-content-center",
             )
 
 # app = dash.Dash(__name__, external_stylesheets=[dbc.themes.COSMO])
@@ -989,6 +1178,9 @@ layout = serve_layout
     Output('iloc_input','placeholder'),
     Output('iloc_input','value'),
     Output('spread','clickData'),
+    Output('div_count','children'),
+    Output('iloc_input','max'),
+
 
     #######################################
     
@@ -1035,17 +1227,63 @@ def update_figs(spread_clickdata,refresh_clicks,submit_clicks,\
                 global_df_rotated, global_rotated_rows, global_rotated_cols, global_df_filtered, global_filtered_rows, global_filtered_cols, global_qudict, global_df_binned, global_df_statedict, global_object_statedict):
 
     
-    print("triggered by element with id : {}".format(dash.callback_context.triggered_id))
-    print("triggered: {}".format(format(dash.callback_context.triggered)))
+    # print("triggered by element with id : {}".format(dash.callback_context.triggered_id))
+    # print("triggered: {}".format(format(dash.callback_context.triggered)))
 
     # firstrun: get df, expand, and plot
     if dash.callback_context.triggered_id is None:
-        print("all initial setup is done in the local page file serverside")
+        # print("all initial setup is done in the local page file serverside")
         raise PreventUpdate
     
+    # if page reloaded within app (switching back from deepdive):
+    if (refresh_clicks == 0) and (submit_clicks == 0) and (spread_clickdata is None) and any([kw is not None for kw in [global_df_rotated, global_rotated_rows, global_rotated_cols, global_df_filtered, global_filtered_rows, global_filtered_cols,global_qudict, global_df_binned, global_df_statedict, global_object_statedict]]):
+        # df_filtered, df_binned_stats = read_from_store_wrapper(global_df_filtered, rows = jsontomind(global_filtered_rows, rows = True), cols = jsontomind(global_filtered_cols), levels = 1),\
+        #     read_from_store_wrapper(global_df_binned, levels = 1)
+        # print('working as expected')
+        # print(global_object_statedict)
+        # dict_df_rotated_reset, mindtojson(rotated_row_names), mindtojson(rotated_col_names), dict_df_filtered_reset, \
+        #     mindtojson(filtered_row_names), mindtojson(filtered_col_names), dict_qudict, dict_dfbinned, df_statedict, object_statedict,\
+        
+        # run calcs
+        df_stats = calc_scstats_and_avgphil(t_input,sig_input)
+        df_rotated = rotate_df(df_stats,tk_input)
+        
+        filtered_row_names = jsontomind(global_filtered_rows, rows = True)
+        filtered_col_names = jsontomind(global_filtered_cols)
+        df_filtered, df_binned_stats = read_from_store_wrapper(global_df_filtered, rows = filtered_row_names, cols = filtered_col_names, levels = 1),\
+            read_from_store_wrapper(global_df_binned, levels = 1)
+        chip_plot,pos_plot,rowindex_plot = global_object_statedict['chip'],global_object_statedict['pos'],global_object_statedict['row_index']
+        sig_input, df_filtered, qudict = global_df_statedict['sigexp'], read_from_store_wrapper(global_df_filtered, rows = jsontomind(global_filtered_rows, rows = True), cols = jsontomind(global_filtered_cols), levels = 1), read_from_store_wrapper(global_qudict, levels = 2)
+        iloc_placeholder = "current iloc : {}".format(df_filtered.index.get_loc((chip_plot,pos_plot,int(rowindex_plot))))
+        
+        # prep data for store
+        global_rotated_rows = rotated_row_names = df_rotated.index
+        global_rotated_cols = rotated_col_names = df_rotated.columns
+        global_filtered_rows = filtered_row_names = df_filtered.index
+        global_filtered_cols = filtered_col_names = df_filtered.columns
+        
+        # print("before (r,c): \n",rotated_row_names,rotated_col_names)
+        global_object_statedict = object_statedict = {
+            'chip':chip_plot,
+            'pos':pos_plot,
+            'row_index':rowindex_plot,
+        }
+        global_df_statedict = df_statedict = {
+            't':t_input,
+            'sigexp':sig_input,
+            'npix':npix_input,
+            'errorthresh':errorthresh_input,
+            'bins':bins_input,
+            'tk':tk_input,
+        }
+        global_df_rotated = dict_df_rotated_reset = jsonify(df_rotated)
+        global_df_filtered = dict_df_filtered_reset = jsonify(df_filtered)
+        global_qudict = dict_qudict = {qu:df.to_dict() for qu,df in qudict.items()}
+        global_df_binned = dict_dfbinned = df_binned_stats.to_dict()
+
     # if global stores are empty
-    if (refresh_clicks == 0) and any([kw is None for kw in [global_df_rotated, global_rotated_rows, global_rotated_cols, global_df_filtered, global_filtered_rows, global_filtered_cols,global_qudict, global_df_binned, global_df_statedict, global_object_statedict]]):
-        print("populating datasets")
+    elif (refresh_clicks == 0) and any([kw is None for kw in [global_df_rotated, global_rotated_rows, global_rotated_cols, global_df_filtered, global_filtered_rows, global_filtered_cols,global_qudict, global_df_binned, global_df_statedict, global_object_statedict]]):
+        # print("populating datasets")
         # print("Nones : {}".format([kw is None for kw in [global_df_rotated, global_rotated_rows, global_rotated_cols, global_df_filtered, global_filtered_rows, global_filtered_cols,\
                                                         #  global_qudict, global_df_binned, global_df_statedict, global_object_statedict]]))
         # run calcs
@@ -1085,8 +1323,8 @@ def update_figs(spread_clickdata,refresh_clicks,submit_clicks,\
         global_df_binned = dict_dfbinned = df_binned_stats.to_dict()
 
     # if refresh clicked
-    if (dash.callback_context.triggered_id == 'refresh_button') and (refresh_clicks > 0):
-        print('refresh clicked',refresh_clicks)
+    elif (dash.callback_context.triggered_id == 'refresh_button') and (refresh_clicks > 0):
+        # print('refresh clicked',refresh_clicks)
 
         # run calcs
         df_stats = calc_scstats_and_avgphil(t_input,sig_input)
@@ -1124,7 +1362,7 @@ def update_figs(spread_clickdata,refresh_clicks,submit_clicks,\
 
     # if submit clicked
     elif (dash.callback_context.triggered_id == 'submit_button') and (submit_clicks > 0):
-        print('submit clicked',submit_clicks)
+        # print('submit clicked',submit_clicks)
         df_filtered, df_binned_stats = read_from_store_wrapper(global_df_filtered, rows = jsontomind(global_filtered_rows, rows = True), cols = jsontomind(global_filtered_cols), levels = 1),\
             read_from_store_wrapper(global_df_binned, levels = 1)
         # print(df_filtered)
@@ -1170,7 +1408,7 @@ def update_figs(spread_clickdata,refresh_clicks,submit_clicks,\
 
     # if spread clicked
     elif (dash.callback_context.triggered_id == 'spread') and (spread_clickdata is not None):
-        print('clickdata triggered', spread_clickdata)
+        # print('clickdata triggered', spread_clickdata)
         filtered_row_names = jsontomind(global_filtered_rows, rows = True)
         filtered_col_names = jsontomind(global_filtered_cols)
         # print("after: \n",pd.MultiIndex.from_arrays(np.array(global_filtered_rows)),pd.MultiIndex.from_arrays(np.array(global_filtered_cols)))
@@ -1203,12 +1441,13 @@ def update_figs(spread_clickdata,refresh_clicks,submit_clicks,\
         dict_dfbinned = df_binned_stats.to_dict()
 
     else:
-        print("probably a recursive primary trigger because of external store inputs / unknown reason")
+        # print("probably a recursive primary trigger because of external store inputs / unknown reason")
         raise PreventUpdate
 
     # chip_output, pos_output, row_index_output, spread_clickdata_output = chip_plot, pos_plot, rowindex_plot, spread_clickdata_plot
 
     # # make plots
+    new_objectcount = df_filtered.shape[0]
     fig_spread = make_stats_scatter(chip_plot, pos_plot, rowindex_plot, df_filtered['across_offsets'])
     fig_rotatedq, fig_rotatedu = make_trendplot(df_filtered['across_offsets'],df_binned_stats)
     fig_q = make_individ_stats_fig('q', chip_plot, pos_plot, rowindex_plot, sig_input, qudict, df_filtered['across_offsets'])
@@ -1216,7 +1455,7 @@ def update_figs(spread_clickdata,refresh_clicks,submit_clicks,\
 
     return (fig_q, fig_u, fig_spread, fig_rotatedq, fig_rotatedu,\
         dict_df_rotated_reset, mindtojson(rotated_row_names), mindtojson(rotated_col_names), dict_df_filtered_reset, mindtojson(filtered_row_names), mindtojson(filtered_col_names), dict_qudict, dict_dfbinned, df_statedict, object_statedict,\
-        chip_plot, pos_plot, rowindex_plot, iloc_placeholder, None, spread_clickdata)
+        chip_plot, pos_plot, rowindex_plot, iloc_placeholder, None, spread_clickdata, new_objectcount, new_objectcount,)
 
 
 # if __name__ == "__main__":
